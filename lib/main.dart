@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
     openingReadingController.text = '';
     closingReadingController.text = '';
 
-    _selectedProducts = 'HSD';
+    _selectedProducts = 'MS';
     super.initState();
   }
 
