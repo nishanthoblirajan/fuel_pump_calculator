@@ -143,6 +143,7 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         total = Column(
           children: <Widget>[
+            /*TODO add custom fonts*/
             Text('Product ---> $_selectedProducts'),
             Text('Rate    ---> $productRate'),
             Text('Sales (in l) ---> $saleInLitres'),
