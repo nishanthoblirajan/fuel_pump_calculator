@@ -17,18 +17,23 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     rateInputController = new TextEditingController();
+    openingReadingController = new TextEditingController();
+    closingReadingController = new TextEditingController();
+    rateInputController.text = '';
+    openingReadingController.text = '';
+    closingReadingController.text = '';
+
     _selectedProducts = 'HSD';
     super.initState();
   }
 
-  Widget estimateButton(){
+  Widget total = Text('Enter Values to calculate');
 
-  }
   @override
   Widget build(BuildContext context) {
-    FocusNode rateFocus;
-    FocusNode openingReadingFocus;
-    FocusNode closingReadingFocus;
+    FocusNode rateFocus = FocusNode();
+    FocusNode openingReadingFocus = FocusNode();
+    FocusNode closingReadingFocus = FocusNode();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -43,37 +48,44 @@ class _MyAppState extends State<MyApp> {
           child: Container(
               child: Column(
             children: <Widget>[
-              Container  (
+              Container(
                 child: new Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RaisedButton(onPressed: (){
+                  children: <Widget>[
+                    Expanded(
+                      child: RaisedButton(
+                        onPressed: () {
                           setState(() {
-                            _selectedProducts='MS';
+                            _selectedProducts = 'MS';
                           });
                         },
-                        child: new Text('MS'),),
+                        child: new Text('MS'),
                       ),
-                      Expanded(
-                        child: RaisedButton(onPressed: (){
+                    ),
+                    Expanded(
+                      child: RaisedButton(
+                        onPressed: () {
                           setState(() {
-                            _selectedProducts='HSD';
+                            _selectedProducts = 'HSD';
                           });
                         },
-                          child: new Text('HSD'),),
-                      )
+                        child: new Text('HSD'),
+                      ),
+                    )
                   ],
                 ),
               ),
-              Text(_selectedProducts,style: TextStyle(
-                fontSize: 20.0,
-              ),),
+              Text(
+                _selectedProducts,
+                style: TextStyle(
+                  fontSize: 20.0,
+                ),
+              ),
               TextFormField(
                 keyboardType: TextInputType.number,
                 controller: rateInputController,
                 textInputAction: TextInputAction.next,
                 focusNode: rateFocus,
-                onFieldSubmitted: (term){
+                onFieldSubmitted: (term) {
                   _fieldFocusChange(context, rateFocus, openingReadingFocus);
                 },
                 decoration: InputDecoration(labelText: 'Price/Litre'),
@@ -83,8 +95,9 @@ class _MyAppState extends State<MyApp> {
                 controller: openingReadingController,
                 textInputAction: TextInputAction.next,
                 focusNode: openingReadingFocus,
-                onFieldSubmitted: (term){
-                  _fieldFocusChange(context, openingReadingFocus, closingReadingFocus);
+                onFieldSubmitted: (term) {
+                  _fieldFocusChange(
+                      context, openingReadingFocus, closingReadingFocus);
                 },
                 decoration: InputDecoration(labelText: 'Opening Reading'),
               ),
@@ -93,19 +106,55 @@ class _MyAppState extends State<MyApp> {
                 controller: closingReadingController,
                 textInputAction: TextInputAction.done,
                 focusNode: closingReadingFocus,
-                onFieldSubmitted: (term){
+                onFieldSubmitted: (term) {
                   closingReadingFocus.unfocus();
+                  calculate();
                 },
-
                 decoration: InputDecoration(labelText: 'Closing Reading'),
               ),
+              new RaisedButton(
+                onPressed: () {
+                  calculate();
+                },
+                child: Text('Calculate'),
+              ),
+
+              total
             ],
           )),
         ),
       ),
     );
   }
-  _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
+
+  void calculate() {
+    if (_selectedProducts != '' &&
+        rateInputController.text != '' &&
+        openingReadingController.text != '' &&
+        closingReadingController.text != '') {
+      double productRate = double.parse(rateInputController.text);
+      double openingReading = double.parse(openingReadingController.text);
+      double closingReading = double.parse(closingReadingController.text);
+      setState(() {
+        total = Column(
+          children: <Widget>[
+            Text('Product ---> $_selectedProducts'),
+            Text('Rate    ---> $productRate'),
+            Text('Sales (in l) ---> ${closingReading - openingReading}'),
+            Text(
+                'Sales (in Rs)---> ${productRate * (closingReading - openingReading)}')
+          ],
+        );
+      });
+    }else{
+      setState(() {
+        total=new Text('Error values. Try Again');
+      });
+    }
+  }
+
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
