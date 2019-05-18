@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pump Calculator',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.blue,fontFamily: 'OpenSans'),
       home: Scaffold(
           resizeToAvoidBottomPadding: false,
         appBar: AppBar(
