@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:share/share.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,9 +41,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pump Calculator',
-      theme: ThemeData(primarySwatch: Colors.blue,fontFamily: 'OpenSans'),
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'OpenSans'),
       home: Scaffold(
-          resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: new Text('Pump Calculator'),
         ),
@@ -121,7 +122,6 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text('Calculate'),
               ),
-
               total
             ],
           )),
@@ -138,31 +138,73 @@ class _MyAppState extends State<MyApp> {
       double productRate = double.parse(rateInputController.text);
       double openingReading = double.parse(openingReadingController.text);
       double closingReading = double.parse(closingReadingController.text);
-      double saleInLitres = dp(closingReading - openingReading,2);
-      double saleInRs = dp(saleInLitres*productRate,2);
+      double saleInLitres = dp(closingReading - openingReading, 2);
+      double saleInRs = dp(saleInLitres * productRate, 2);
       setState(() {
-        total = Column(
-          children: <Widget>[
-            /*TODO add custom fonts*/
-            Text('Product ---> $_selectedProducts'),
-            Text('Rate    ---> $productRate'),
-            Text('Sales (in l) ---> $saleInLitres'),
-            Text(
-                'Sales (in Rs)---> $saleInRs'),
-          ],
+        total = Expanded(
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  /*TODO add custom fonts*/
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Product',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Rate',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Sales (in l)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Sales (in Rs)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('$_selectedProducts'),
+                      Text('₹ $productRate/litre'),
+                      Text('$saleInLitres litres'),
+                      Text('₹ $saleInRs'),
+                    ],
+                  ),
+
+                ],
+              ),
+              IconButton(icon: Icon(Icons.share),onPressed: (){
+                Share.share(
+                    'Product - $_selectedProducts\n'
+                    'Rate - ₹ $productRate/litre\n'
+                    'Sales (in l) - $saleInLitres litres\n'
+                    'Sales (in Rs) - ₹ $saleInRs');
+
+              },)
+            ],
+          ),
         );
       });
-    }else{
+    } else {
       setState(() {
-        total=new Text('Error values. Try Again');
+        total = new Text('Error values. Try Again');
       });
     }
   }
 
-  double dp(double val, double places){
+  double dp(double val, double places) {
     double mod = pow(10.0, places);
     return ((val * mod).round().toDouble() / mod);
   }
+
   _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
