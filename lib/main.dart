@@ -45,7 +45,8 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
-          title: new Text('Pump Calculator'),
+          centerTitle: true,
+          title: new Text('Pump Calculator',),
         ),
         body: Padding(
           padding: const EdgeInsets.all(12.0),
