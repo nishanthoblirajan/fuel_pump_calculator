@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -40,6 +42,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Pump Calculator',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
+          resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: new Text('Pump Calculator'),
         ),
@@ -135,14 +138,16 @@ class _MyAppState extends State<MyApp> {
       double productRate = double.parse(rateInputController.text);
       double openingReading = double.parse(openingReadingController.text);
       double closingReading = double.parse(closingReadingController.text);
+      double saleInLitres = dp(closingReading - openingReading,2);
+      double saleInRs = dp(saleInLitres*productRate,2);
       setState(() {
         total = Column(
           children: <Widget>[
             Text('Product ---> $_selectedProducts'),
             Text('Rate    ---> $productRate'),
-            Text('Sales (in l) ---> ${closingReading - openingReading}'),
+            Text('Sales (in l) ---> $saleInLitres'),
             Text(
-                'Sales (in Rs)---> ${productRate * (closingReading - openingReading)}')
+                'Sales (in Rs)---> $saleInRs'),
           ],
         );
       });
@@ -153,6 +158,10 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  double dp(double val, double places){
+    double mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
+  }
   _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
