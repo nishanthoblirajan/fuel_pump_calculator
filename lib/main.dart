@@ -186,6 +186,8 @@ class _MyAppState extends State<MyApp> {
                 Share.share(
                     'Product - $_selectedProducts\n'
                     'Rate - ₹ $productRate/litre\n'
+                    'Opening - $openingReading\n'
+                    'Closing - $closingReading\n'
                     'Sales (in l) - $saleInLitres litres\n'
                     'Sales (in Rs) - ₹ $saleInRs');
 
