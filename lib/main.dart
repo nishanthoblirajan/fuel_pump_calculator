@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 
@@ -18,7 +19,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    // TODO: implement initState
+
+    FacebookAudienceNetwork.init(
+      testingId: "6ee3cda2-63d3-4ba1-ad4b-06fc346f7d5e",
+    );
     rateInputController = new TextEditingController();
     openingReadingController = new TextEditingController();
     closingReadingController = new TextEditingController();
@@ -48,84 +52,116 @@ class _MyAppState extends State<MyApp> {
           centerTitle: true,
           title: new Text('Pump Calculator',),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Container(
-              child: Column(
-            children: <Widget>[
-              Container(
-                child: new Row(
+        body: Column(
+          children: <Widget>[
+            Container(
+              alignment: Alignment(0.5, 1),
+              child: FacebookBannerAd(
+                placementId: "2342543822724448_2342544912724339",
+                bannerSize: BannerSize.STANDARD,
+                listener: (result, value) {
+                  switch (result) {
+                    case BannerAdResult.ERROR:
+                      print("Error: $value");
+                      break;
+                    case BannerAdResult.LOADED:
+                      print("Loaded: $value");
+                      break;
+                    case BannerAdResult.CLICKED:
+                      print("Clicked: $value");
+                      break;
+                    case BannerAdResult.LOGGING_IMPRESSION:
+                      print("Logging Impression: $value");
+                      break;
+                  }
+                },
+              ),
+            ),
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                    child: Column(
                   children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedProducts = 'MS';
-                          });
-                        },
-                        child: new Text('MS'),
+
+                    Container(
+                      child: new Row(
+                        children: <Widget>[
+//                    2342543822724448_2342544912724339
+
+                          Expanded(
+                            child: RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedProducts = 'MS';
+                                });
+                              },
+                              child: new Text('MS'),
+                            ),
+                          ),
+                          Expanded(
+                            child: RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedProducts = 'HSD';
+                                });
+                              },
+                              child: new Text('HSD'),
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: RaisedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedProducts = 'HSD';
-                          });
-                        },
-                        child: new Text('HSD'),
+                    Text(
+                      _selectedProducts,
+                      style: TextStyle(
+                        fontSize: 20.0,
                       ),
-                    )
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      controller: rateInputController,
+                      textInputAction: TextInputAction.next,
+                      focusNode: rateFocus,
+                      onFieldSubmitted: (term) {
+                        _fieldFocusChange(context, rateFocus, openingReadingFocus);
+                      },
+                      decoration: InputDecoration(labelText: 'Price/Litre'),
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      controller: openingReadingController,
+                      textInputAction: TextInputAction.next,
+                      focusNode: openingReadingFocus,
+                      onFieldSubmitted: (term) {
+                        _fieldFocusChange(
+                            context, openingReadingFocus, closingReadingFocus);
+                      },
+                      decoration: InputDecoration(labelText: 'Opening Reading'),
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      controller: closingReadingController,
+                      textInputAction: TextInputAction.done,
+                      focusNode: closingReadingFocus,
+                      onFieldSubmitted: (term) {
+                        closingReadingFocus.unfocus();
+                        calculate();
+                      },
+                      decoration: InputDecoration(labelText: 'Closing Reading'),
+                    ),
+                    new RaisedButton(
+                      onPressed: () {
+                        calculate();
+                      },
+                      child: Text('Calculate'),
+                    ),
+                    total
                   ],
-                ),
+                )),
               ),
-              Text(
-                _selectedProducts,
-                style: TextStyle(
-                  fontSize: 20.0,
-                ),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: rateInputController,
-                textInputAction: TextInputAction.next,
-                focusNode: rateFocus,
-                onFieldSubmitted: (term) {
-                  _fieldFocusChange(context, rateFocus, openingReadingFocus);
-                },
-                decoration: InputDecoration(labelText: 'Price/Litre'),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: openingReadingController,
-                textInputAction: TextInputAction.next,
-                focusNode: openingReadingFocus,
-                onFieldSubmitted: (term) {
-                  _fieldFocusChange(
-                      context, openingReadingFocus, closingReadingFocus);
-                },
-                decoration: InputDecoration(labelText: 'Opening Reading'),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: closingReadingController,
-                textInputAction: TextInputAction.done,
-                focusNode: closingReadingFocus,
-                onFieldSubmitted: (term) {
-                  closingReadingFocus.unfocus();
-                  calculate();
-                },
-                decoration: InputDecoration(labelText: 'Closing Reading'),
-              ),
-              new RaisedButton(
-                onPressed: () {
-                  calculate();
-                },
-                child: Text('Calculate'),
-              ),
-              total
-            ],
-          )),
+            ),
+          ],
         ),
       ),
     );
