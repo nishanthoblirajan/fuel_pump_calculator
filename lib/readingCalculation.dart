@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
+import 'package:get/get.dart';
 
 import 'main.dart';
 
@@ -22,6 +23,17 @@ class _readingCalculationState extends State<readingCalculation> {
     }
 
     super.initState();
+    // descriptionFocus.requestFocus();
+  }
+
+  final FocusNode startingReadingFocus = FocusNode();
+  final FocusNode endingReadingFocus = FocusNode();
+  final FocusNode rateFocus = FocusNode();
+  final FocusNode descriptionFocus = FocusNode();
+  final FocusNode calculateFocus = FocusNode();
+  @override
+  void dispose() {
+    super.dispose();
   }
 
 //  Navigator.of(context).push(new MaterialPageRoute(
@@ -41,6 +53,12 @@ class _readingCalculationState extends State<readingCalculation> {
   TextEditingController endingReadingController = new TextEditingController();
   TextEditingController rateController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
+  fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
+
 
   num total = 0;
   Widget content(BuildContext context) {
@@ -51,44 +69,67 @@ class _readingCalculationState extends State<readingCalculation> {
         child: Column(
           children: <Widget>[
             new ListTile(
-              title: new TextField(
+              title: new TextFormField(
                 keyboardType: TextInputType.text,
+                focusNode: descriptionFocus,
+                // autofocus: true,
+                onFieldSubmitted: fieldFocusChange(context,descriptionFocus,startingReadingFocus),
                 controller: descriptionController,
+                textInputAction: TextInputAction.next,
+
                 decoration: new InputDecoration(
                   labelText: "Description",
                 ),
               ),
             ),
             new ListTile(
-              title: new TextField(
-                keyboardType: TextInputType.numberWithOptions(),
-                controller: rateController,
-                decoration: new InputDecoration(
-                  labelText: "Rate",
-                ),
-              ),
-            ),
-            new ListTile(
-              title: new TextField(
+              title: new TextFormField(
+                focusNode: startingReadingFocus,
+                onFieldSubmitted: fieldFocusChange(context,startingReadingFocus,endingReadingFocus),
+
                 keyboardType: TextInputType.numberWithOptions(),
                 controller: startingReadingController,
+                textInputAction: TextInputAction.next,
+
                 decoration: new InputDecoration(
                   labelText: "Starting Reading",
                 ),
               ),
             ),
             new ListTile(
-              title: new TextField(
+              title: new TextFormField(
+                focusNode: endingReadingFocus,
+                onFieldSubmitted: fieldFocusChange(context,endingReadingFocus,rateFocus),
+
                 keyboardType: TextInputType.numberWithOptions(),
                 controller: endingReadingController,
+                textInputAction: TextInputAction.next,
+
                 decoration: new InputDecoration(
                   labelText: "Ending Reading",
                 ),
               ),
             ),
+            new ListTile(
+              title: new TextFormField(
+                onFieldSubmitted: fieldFocusChange(context,rateFocus,calculateFocus),
+
+                focusNode: rateFocus,
+                keyboardType: TextInputType.numberWithOptions(),
+                controller: rateController,
+                textInputAction: TextInputAction.next,
+
+                decoration: new InputDecoration(
+                  labelText: "Rate",
+                ),
+              ),
+            ),
+
             RaisedButton(
+
+              focusNode: calculateFocus,
               child: Text(
-                'Calculate',
+                'Add',
               ),
               onPressed: () {
                 setState(() {
@@ -97,7 +138,7 @@ class _readingCalculationState extends State<readingCalculation> {
                       startingReadingController,
                       endingReadingController,
                       rateController);
-                  Navigator.pop(context);
+                  Get.back();
                 });
               },
             ),

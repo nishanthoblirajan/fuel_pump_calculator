@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:fuel_pump_calculator/readingCalculation.dart';
+import 'package:get/get.dart';
 import 'package:share/share.dart';
 
 import 'DataClass/Credit.dart';
@@ -15,7 +16,7 @@ import 'expenseCalculation.dart';
 List<Credit> creditList = new List();
 List<Expense> expenseList = new List();
 List<Reading> readingList = new List();
-void main() => runApp(MaterialApp(
+void main() => runApp(GetMaterialApp(
       home: MyApp(),
       debugShowCheckedModeBanner: false,
       title: 'Pump Calculator',
@@ -55,14 +56,6 @@ class _MyAppState extends State<MyApp> {
     return Text((ending - starting).toStringAsFixed(2));
   }
 
-  num reading(num starting, num ending, num rate) {
-    return (ending - starting) * rate;
-  }
-
-  num credit(num litre, num rate) {
-    return litre * rate;
-  }
-
   Widget calculateReadingTotal(num starting, num ending, num rate) {
     return Text(((ending - starting) * rate).toStringAsFixed(2));
   }
@@ -73,17 +66,8 @@ class _MyAppState extends State<MyApp> {
 
   Widget displayTotalAmount() {
     num totalToDisplay = 0;
-    for (var r in readingList) {
-      totalToDisplay += reading(r.startingReading, r.endingReading, r.rate);
-    }
-
-    for (var c in creditList) {
-      totalToDisplay -= credit(c.litre, c.rate);
-    }
-
-    for (var e in expenseList) {
-      totalToDisplay -= e.amount;
-    }
+    totalToDisplay =
+        Calculations().calculateTotal(readingList, expenseList, creditList);
     return Text('${totalToDisplay.toStringAsFixed(2)}');
   }
 
@@ -111,24 +95,50 @@ class _MyAppState extends State<MyApp> {
               ? IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    setState(() {
-                      readingList.clear();
-                      expenseList.clear();
-                      creditList.clear();
-                    });
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Confirmation'),
+                            content: Text('Clear all data?'),
+                            actions: [
+                              FlatButton(
+                                child: Text(
+                                  'No',
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text(
+                                  'Yes',
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    readingList.clear();
+                                    expenseList.clear();
+                                    creditList.clear();
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        });
                   },
                 )
               : Container(),
-
           !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
               ? IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {
-              setState(() {
-                Calculations().share(readingList,expenseList,creditList);
-              });
-            },
-          )
+                  icon: Icon(Icons.share),
+                  onPressed: () {
+                    setState(() {
+                      Calculations()
+                          .share(readingList, expenseList, creditList);
+                    });
+                  },
+                )
               : Container(),
         ],
       ),
@@ -161,47 +171,52 @@ class _MyAppState extends State<MyApp> {
             //     },
             //   ),
             // ),
-            RaisedButton(
-              child: Text(
-                'Add Reading',
-              ),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext buildContext) {
-                      return readingCalculation(
-                        dialog: true,
-                      );
-                    });
-              },
-            ),
-            RaisedButton(
-              child: Text(
-                'Add Credit Sale',
-              ),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext buildContext) {
-                      return creditCalculation(
-                        dialog: true,
-                      );
-                    });
-              },
-            ),
-            RaisedButton(
-              child: Text(
-                'Add Expense',
-              ),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext buildContext) {
-                      return expenseCalculation(
-                        dialog: true,
-                      );
-                    });
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RaisedButton(
+                  child: Text(
+                    'Reading',
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return readingCalculation(
+                            dialog: true,
+                          );
+                        });
+                  },
+                ),
+                RaisedButton(
+                  child: Text(
+                    'Credit Sale',
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return creditCalculation(
+                            dialog: true,
+                          );
+                        });
+                  },
+                ),
+                RaisedButton(
+                  child: Text(
+                    'Expense',
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return expenseCalculation(
+                            dialog: true,
+                          );
+                        });
+                  },
+                ),
+              ],
             ),
 
             displayTotalAmount(),
@@ -390,7 +405,7 @@ class _MyAppState extends State<MyApp> {
                 label: Expanded(child: Container(child: Text('Amount')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(readingList.length, (index) {
+          rows: List.generate(expenseList.length, (index) {
             return DataRow(cells: <DataCell>[
               DataCell(Text(expenseList[index].description)),
               DataCell(Text(expenseList[index].amount.toString())),
@@ -422,7 +437,7 @@ class _MyAppState extends State<MyApp> {
                 label: Expanded(child: Container(child: Text('Amount')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(readingList.length, (index) {
+          rows: List.generate(creditList.length, (index) {
             return DataRow(cells: <DataCell>[
               DataCell(Text(creditList[index].description)),
               DataCell(Text(creditList[index].litre.toString())),
