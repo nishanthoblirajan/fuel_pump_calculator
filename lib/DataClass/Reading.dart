@@ -61,7 +61,7 @@ class Reading {
 
   @override
   String toString() {
-    return 'Readings:\n Description: $description\n Starting: $startingReading\n Ending: $endingReading\n Litres: ${readingLitre(startingReading, endingReading)}\n Rate: $rate\n Amount: ${reading(startingReading, endingReading, rate).toStringAsFixed(2)}\n';
+    return 'Readings:\n Description: $description\n Starting: $startingReading\n Ending: $endingReading\n Litres: ${readingLitre(startingReading, endingReading).toStringAsFixed(2)}\n Rate: $rate\n Amount: ${reading(startingReading, endingReading, rate).toStringAsFixed(2)}\n';
   }
 
   @override
