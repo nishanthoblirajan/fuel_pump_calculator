@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
+import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:fuel_pump_calculator/readingCalculation.dart';
 import 'package:share/share.dart';
@@ -117,6 +118,17 @@ class _MyAppState extends State<MyApp> {
                     });
                   },
                 )
+              : Container(),
+
+          !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+              ? IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              setState(() {
+                Calculations().share(readingList,expenseList,creditList);
+              });
+            },
+          )
               : Container(),
         ],
       ),

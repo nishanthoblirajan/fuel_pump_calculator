@@ -40,7 +40,8 @@ class Expense {
       Expense.fromMap(json.decode(source));
 
   @override
-  String toString() => 'Expense(description: $description, amount: $amount)';
+  String toString() =>
+      'Expense:\n $description: ${amount.toStringAsFixed(2)}\n';
 
   @override
   bool operator ==(Object o) {

@@ -51,9 +51,17 @@ class Reading {
   factory Reading.fromJson(String source) =>
       Reading.fromMap(json.decode(source));
 
+  num reading(num starting, num ending, num rate) {
+    return (ending - starting) * rate;
+  }
+
+  num readingLitre(num starting, num ending) {
+    return (ending - starting);
+  }
+
   @override
   String toString() {
-    return 'Reading(description: $description, startingReading: $startingReading, endingReading: $endingReading, rate: $rate)';
+    return 'Readings:\n Description: $description\n Starting: $startingReading\n Ending: $endingReading\n Litres: ${readingLitre(startingReading, endingReading)}\n Rate: $rate\n Amount: ${reading(startingReading, endingReading, rate).toStringAsFixed(2)}\n';
   }
 
   @override

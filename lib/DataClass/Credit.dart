@@ -44,9 +44,13 @@ class Credit {
 
   factory Credit.fromJson(String source) => Credit.fromMap(json.decode(source));
 
+  num credit(num litre, num rate) {
+    return litre * rate;
+  }
+
   @override
   String toString() =>
-      'Credit(description: $description, litre: $litre, rate: $rate)';
+      'Credit:\n Description: $description\n Litre: $litre\n Rate: $rate\n Amount:${credit(litre, rate).toStringAsFixed(2)}\n';
 
   @override
   bool operator ==(Object o) {
