@@ -54,13 +54,14 @@ class _MyAppState extends State<MyApp> {
     return Text((ending - starting).toStringAsFixed(2));
   }
 
-  num reading(num starting,num ending,num rate){
-    return (ending-starting)*rate;
+  num reading(num starting, num ending, num rate) {
+    return (ending - starting) * rate;
   }
 
-  num credit(num litre,num rate){
-    return litre*rate;
+  num credit(num litre, num rate) {
+    return litre * rate;
   }
+
   Widget calculateReadingTotal(num starting, num ending, num rate) {
     return Text(((ending - starting) * rate).toStringAsFixed(2));
   }
@@ -69,19 +70,18 @@ class _MyAppState extends State<MyApp> {
     return Text((litre * rate).toStringAsFixed(2));
   }
 
-
-  Widget displayTotalAmount(){
+  Widget displayTotalAmount() {
     num totalToDisplay = 0;
-    for(var r in readingList){
-      totalToDisplay+=reading(r.startingReading, r.endingReading,r.rate);
+    for (var r in readingList) {
+      totalToDisplay += reading(r.startingReading, r.endingReading, r.rate);
     }
 
-    for(var c in creditList){
-      totalToDisplay-=credit(c.litre,c.rate);
+    for (var c in creditList) {
+      totalToDisplay -= credit(c.litre, c.rate);
     }
 
-    for(var e in expenseList){
-      totalToDisplay-=e.amount;
+    for (var e in expenseList) {
+      totalToDisplay -= e.amount;
     }
     return Text('${totalToDisplay.toStringAsFixed(2)}');
   }
@@ -122,7 +122,6 @@ class _MyAppState extends State<MyApp> {
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +194,6 @@ class _MyAppState extends State<MyApp> {
 
             displayTotalAmount(),
 
-
             readingList.isNotEmpty ? Text('Reading') : Text(''),
             readingList.isNotEmpty ? buildReadingList() : Text(''),
 
@@ -233,7 +231,6 @@ class _MyAppState extends State<MyApp> {
             //         return new Text(expenseList[index].toString());
             //       }),
             // ),
-
 
             /*Old Code */
 //           Container(
@@ -342,6 +339,7 @@ class _MyAppState extends State<MyApp> {
             DataColumn(label: Expanded(child: Container(child: Text('Rate')))),
             DataColumn(
                 label: Expanded(child: Container(child: Text('Amount')))),
+            DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
           rows: List.generate(readingList.length, (index) {
             return DataRow(cells: <DataCell>[
@@ -354,6 +352,16 @@ class _MyAppState extends State<MyApp> {
               DataCell(Text(readingList[index].rate.toString())),
               DataCell(calculateReadingTotal(readingList[index].startingReading,
                   readingList[index].endingReading, readingList[index].rate)),
+              DataCell(
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      readingList.removeAt(index);
+                    });
+                  },
+                ),
+              ),
             ]);
           })),
     );
@@ -368,11 +376,22 @@ class _MyAppState extends State<MyApp> {
                 label: Expanded(child: Container(child: Text('Description')))),
             DataColumn(
                 label: Expanded(child: Container(child: Text('Amount')))),
+            DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
           rows: List.generate(readingList.length, (index) {
             return DataRow(cells: <DataCell>[
               DataCell(Text(expenseList[index].description)),
               DataCell(Text(expenseList[index].amount.toString())),
+              DataCell(
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      expenseList.removeAt(index);
+                    });
+                  },
+                ),
+              ),
             ]);
           })),
     );
@@ -389,6 +408,7 @@ class _MyAppState extends State<MyApp> {
             DataColumn(label: Expanded(child: Container(child: Text('Rate')))),
             DataColumn(
                 label: Expanded(child: Container(child: Text('Amount')))),
+            DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
           rows: List.generate(readingList.length, (index) {
             return DataRow(cells: <DataCell>[
@@ -397,6 +417,16 @@ class _MyAppState extends State<MyApp> {
               DataCell(Text(creditList[index].rate.toString())),
               DataCell(calculateCreditTotal(
                   creditList[index].litre, creditList[index].rate)),
+              DataCell(
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      creditList.removeAt(index);
+                    });
+                  },
+                ),
+              ),
             ]);
           })),
     );
