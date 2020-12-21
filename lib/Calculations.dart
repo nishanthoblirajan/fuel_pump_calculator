@@ -154,7 +154,7 @@ class Calculations {
     if(selection==1){
       expenseTotal=-expenseTotal;
     }
-    expenseList
+    extraList
         .add(new Extra(description: description.text, amount: expenseTotal));
 
 

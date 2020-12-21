@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:fuel_pump_calculator/PDFPrint.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
@@ -14,13 +16,14 @@ import 'DataClass/Credit.dart';
 import 'DataClass/Extra.dart';
 import 'DataClass/Reading.dart';
 import 'HexColor.dart';
+import 'Preferences.dart';
 import 'extraCalculation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
 List<Credit> creditList = new List();
-List<Extra> expenseList = new List();
+List<Extra> extraList = new List();
 List<Reading> readingList = new List();
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
@@ -102,7 +105,7 @@ class _MyAppState extends State<MyApp> {
   Widget displayTotalAmount() {
     num totalToDisplay = 0;
     totalToDisplay =
-        Calculations().calculateTotal(readingList, expenseList, creditList);
+        Calculations().calculateTotal(readingList, extraList, creditList);
     return Text('${totalToDisplay.toStringAsFixed(2)}',style: finalAmountStyle(),);
   }
 
@@ -126,6 +129,27 @@ class _MyAppState extends State<MyApp> {
     return TextStyle(fontWeight: FontWeight.w900,
       fontStyle: FontStyle.normal,fontSize: 24,);
   }
+
+
+  /*todo save operation*/
+  // saveAll() async {
+  //   // ignore: unnecessary_statements
+  //   readingList.isNotEmpty?await Preferences().setReadings(readingList.toJson()):null;
+  //   creditList.isNotEmpty?await Preferences().setCredits(creditList.toString()):null;
+  //   extraList.isNotEmpty?await Preferences().setExtras(extraList.toString()):null;
+  //   Fluttertoast.showToast(msg: 'Saved');
+  // }
+  //
+  // retrieveAll() async {
+  //   String readings = await Preferences().getReadings();
+  //   print('reading string is $readings');
+  //   var tagObjsJson = jsonDecode(readings)['Reading'] as List;
+  //
+  //   List<Reading> tagObjs = tagObjsJson.map((tagJson) => Reading.fromJson(tagJson)).toList();
+  //   print('Readings is ${tagObjs.toString()}');
+  //
+  // }
+
   @override
   Widget build(BuildContext context) {
 
@@ -137,6 +161,16 @@ class _MyAppState extends State<MyApp> {
           title: new Text(
             'Pump Calculator',
           ),
+          // leading: !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+          //     ? IconButton(
+          //   icon: Icon(Icons.save),
+          //   onPressed: () {
+          //     // saveAll();
+          //     // retrieveAll();
+          //
+          //   },
+          // )
+          //     : Container(),
           actions: [
             // IconButton(
             //   icon: Icon(Icons.refresh),
@@ -144,7 +178,7 @@ class _MyAppState extends State<MyApp> {
             //     setState(() {});
             //   },
             // ),
-            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
                 ? IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
@@ -170,7 +204,7 @@ class _MyAppState extends State<MyApp> {
                                   onPressed: () {
                                     setState(() {
                                       readingList.clear();
-                                      expenseList.clear();
+                                      extraList.clear();
                                       creditList.clear();
                                     });
                                     Navigator.pop(context);
@@ -182,21 +216,21 @@ class _MyAppState extends State<MyApp> {
                     },
                   )
                 : Container(),
-            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
                 ? IconButton(
               icon: Icon(Icons.download_sharp),
               onPressed: () {
-                PDFPrint().pdfTotal(readingList, creditList, expenseList);
+                PDFPrint().pdfTotal(readingList, creditList, extraList);
               },
             )
                 : Container(),
-            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
                 ? IconButton(
                     icon: Icon(Icons.share),
                     onPressed: () {
                       setState(() {
                         Calculations()
-                            .share(readingList, expenseList, creditList);
+                            .share(readingList, extraList, creditList);
                       });
                     },
                   )
@@ -209,29 +243,29 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Container(
-              //   alignment: Alignment(0.5, 1),
-              //   child: FacebookBannerAd(
-              //     placementId: "2342543822724448_2342544912724339",
-              //     bannerSize: BannerSize.STANDARD,
-              //     listener: (result, value) {
-              //       switch (result) {
-              //         case BannerAdResult.ERROR:
-              //           print("Error: $value");
-              //           break;
-              //         case BannerAdResult.LOADED:
-              //           print("Loaded: $value");
-              //           break;
-              //         case BannerAdResult.CLICKED:
-              //           print("Clicked: $value");
-              //           break;
-              //         case BannerAdResult.LOGGING_IMPRESSION:
-              //           print("Logging Impression: $value");
-              //           break;
-              //       }
-              //     },
-              //   ),
-              // ),
+              Container(
+                alignment: Alignment(0.5, 1),
+                child: FacebookBannerAd(
+                  placementId: "2342543822724448_2342544912724339",
+                  bannerSize: BannerSize.STANDARD,
+                  listener: (result, value) {
+                    switch (result) {
+                      case BannerAdResult.ERROR:
+                        print("Error: $value");
+                        break;
+                      case BannerAdResult.LOADED:
+                        print("Loaded: $value");
+                        break;
+                      case BannerAdResult.CLICKED:
+                        print("Clicked: $value");
+                        break;
+                      case BannerAdResult.LOGGING_IMPRESSION:
+                        print("Logging Impression: $value");
+                        break;
+                    }
+                  },
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -280,7 +314,7 @@ class _MyAppState extends State<MyApp> {
                 ],
               ),
 
-              (readingList.isNotEmpty||creditList.isNotEmpty||expenseList.isNotEmpty)?Center(child: displayTotalAmount()):Padding(
+              (readingList.isNotEmpty||creditList.isNotEmpty||extraList.isNotEmpty)?Center(child: displayTotalAmount()):Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(ApplicationConstants.mainTips,style: TextStyle(color: Colors.blueGrey,fontStyle: FontStyle.italic),),
               ),
@@ -312,8 +346,8 @@ class _MyAppState extends State<MyApp> {
               //       }),
               // )
 
-              expenseList.isNotEmpty ? displayData('Extras',  Calculations().calculateExtraTotal(expenseList)) : Text(''),
-              expenseList.isNotEmpty ? buildExpenseList() : Text(''),
+              extraList.isNotEmpty ? displayData('Extras',  Calculations().calculateExtraTotal(extraList)) : Text(''),
+              extraList.isNotEmpty ? buildExpenseList() : Text(''),
               // Expanded(
               //   child: new ListView.builder(
               //       shrinkWrap: true,
@@ -470,16 +504,16 @@ class _MyAppState extends State<MyApp> {
                 label: Expanded(child: Container(child: Text('Amount')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(expenseList.length, (index) {
+          rows: List.generate(extraList.length, (index) {
             return DataRow(cells: <DataCell>[
-              DataCell(Text(expenseList[index].description)),
-              DataCell(Text(expenseList[index].amount.toString())),
+              DataCell(Text(extraList[index].description)),
+              DataCell(Text(extraList[index].amount.toString())),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
                     setState(() {
-                      expenseList.removeAt(index);
+                      extraList.removeAt(index);
                     });
                   },
                 ),

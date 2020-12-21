@@ -91,7 +91,7 @@ packages:
       name: facebook_audience_network
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.1"
+    version: "0.8.0"
   fake_async:
     dependency: transitive
     description:
@@ -177,6 +177,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fluttertoast:
+    dependency: "direct main"
+    description:
+      name: fluttertoast
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.1.6"
   get:
     dependency: "direct main"
     description:

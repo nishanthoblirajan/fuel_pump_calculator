@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fuel_pump_calculator/ApplicationConstants.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
@@ -28,7 +29,7 @@ class PDFPrint {
               alignment: Alignment.centerRight,
               margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
               child: Text(
-                  'Fuel Pump Calculator',
+                  'Fuel Pump Calculator ${ApplicationConstants.versionNumber} ${ApplicationConstants.copyrightText}',
                   style: Theme.of(context)
                       .defaultTextStyle
                       .copyWith(color: PdfColors.grey)));
