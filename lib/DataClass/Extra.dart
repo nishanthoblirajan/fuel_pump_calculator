@@ -1,18 +1,18 @@
 import 'dart:convert';
 
-class Expense {
+class Extra {
   String description;
   num amount;
-  Expense({
+  Extra({
     this.description,
     this.amount,
   });
 
-  Expense copyWith({
+  Extra copyWith({
     String description,
     num amount,
   }) {
-    return Expense(
+    return Extra(
       description: description ?? this.description,
       amount: amount ?? this.amount,
     );
@@ -25,10 +25,10 @@ class Expense {
     };
   }
 
-  factory Expense.fromMap(Map<String, dynamic> map) {
+  factory Extra.fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
 
-    return Expense(
+    return Extra(
       description: map['description'],
       amount: map['amount'],
     );
@@ -36,18 +36,18 @@ class Expense {
 
   String toJson() => json.encode(toMap());
 
-  factory Expense.fromJson(String source) =>
-      Expense.fromMap(json.decode(source));
+  factory Extra.fromJson(String source) =>
+      Extra.fromMap(json.decode(source));
 
   @override
   String toString() =>
-      'Expense:\n $description: ${amount.toStringAsFixed(2)}\n';
+      'Extras:\n $description: ${amount.toStringAsFixed(2)}\n';
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is Expense && o.description == description && o.amount == amount;
+    return o is Extra && o.description == description && o.amount == amount;
   }
 
   @override

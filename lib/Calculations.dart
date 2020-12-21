@@ -3,7 +3,7 @@ import 'package:fuel_pump_calculator/DataClass/Credit.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:share/share.dart';
 
-import 'DataClass/Expense.dart';
+import 'DataClass/Extra.dart';
 import 'DataClass/Reading.dart';
 import 'main.dart';
 
@@ -24,10 +24,10 @@ class Calculations {
     return totalToDisplay;
   }
 
-  num calculateExpenseTotal(List<Expense> expenses){
+  num calculateExtraTotal(List<Extra> extras){
     num totalToDisplay = 0;
 
-    for (var e in expenses) {
+    for (var e in extras) {
       totalToDisplay += e.amount;
     }
     return totalToDisplay;
@@ -45,11 +45,11 @@ class Calculations {
   }
   
   
-  num calculateTotal(List<Reading> readings,List<Expense> expenses,List<Credit> credits){
+  num calculateTotal(List<Reading> readings,List<Extra> extras,List<Credit> credits){
     num totalToDisplay = 0;
     totalToDisplay+=calculateReadingTotal(readings);
     totalToDisplay-=calculateCreditTotal(credits);
-    totalToDisplay-=calculateExpenseTotal( expenses);
+    totalToDisplay+=calculateExtraTotal( extras);
 
 
 
@@ -61,7 +61,7 @@ class Calculations {
   shareReading(String index,Reading reading){
     return '${index}. ${reading.toString()}';
   }
-  shareExpense(String index,Expense expense){
+  shareExtra(String index,Extra expense){
     return '${index}. ${expense.toString()}';
   }
   shareCredit(String index,Credit credit){
@@ -69,7 +69,7 @@ class Calculations {
   }
 
 
-  share(List<Reading> readings,List<Expense> expenses,List<Credit> credits){
+  share(List<Reading> readings,List<Extra> extras,List<Credit> credits){
     String shareString = '';
 
 
@@ -92,19 +92,19 @@ class Calculations {
     if(credits.isNotEmpty){
       shareString+='*Credits Total: ${calculateCreditTotal(credits).toStringAsFixed(2)}*\n-------\n';
     }
-    if(expenses.isNotEmpty){
-      shareString+='*Expenses*\n';
+    if(extras.isNotEmpty){
+      shareString+='*Extras*\n';
     }
     
     
-    for(int i=0;i<expenses.length;i++){
-      shareString+=shareExpense((i+1).toString(), expenses[i]);
+    for(int i=0;i<extras.length;i++){
+      shareString+=shareExtra((i+1).toString(), extras[i]);
     }
-    if(expenses.isNotEmpty){
-      shareString+='*Expenses Total: ${calculateExpenseTotal(expenses).toStringAsFixed(2)}*\n-------\n';
+    if(extras.isNotEmpty){
+      shareString+='*Extras Total: ${calculateExtraTotal(extras).toStringAsFixed(2)}*\n-------\n';
     }
     shareString+='\n************************\n';
-    shareString+='*Total Amount: ${calculateTotal(readings, expenses, credits).toStringAsFixed(2)}*';
+    shareString+='*Total Amount: ${calculateTotal(readings, extras, credits).toStringAsFixed(2)}*';
 
 
     Share.share(shareString);
@@ -142,18 +142,21 @@ class Calculations {
     return total.round();
   }
 
-  expenseCalculation(
+  extraCalculation(
     TextEditingController description,
-    TextEditingController expenseController,
+    TextEditingController expenseController,int selection
   ) {
     num expenseTotal = 0;
 
     if (expenseController.text != '') {
       expenseTotal = num.parse(expenseController.text);
     }
-
+    if(selection==1){
+      expenseTotal=-expenseTotal;
+    }
     expenseList
-        .add(new Expense(description: description.text, amount: expenseTotal));
+        .add(new Extra(description: description.text, amount: expenseTotal));
+
 
     return expenseTotal;
   }

@@ -4,7 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
 
-import 'DataClass/Expense.dart';
+import 'DataClass/Extra.dart';
 import 'DataClass/Reading.dart';
 import 'DataClass/Credit.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'Calculations.dart';
 
 class PDFPrint {
-  pdfTotal(List<Reading> readings,List<Credit> credits,List<Expense> expenses) async {
+  pdfTotal(List<Reading> readings,List<Credit> credits,List<Extra> extras) async {
     final Document pdf = Document(deflate: zlib.encode);
 
     pdf.addPage(MultiPage(
@@ -54,20 +54,20 @@ class PDFPrint {
           credits.isNotEmpty?Text('\nTotal Credit Amount: ${Calculations().calculateCreditTotal(credits).toStringAsFixed(2)}'):Text(''),
 
           /*Expense Table*/
-          expenses.isNotEmpty?Header(level: 1,text: 'Expense Calculation'):Text(''),
+          extras.isNotEmpty?Header(level: 1,text: 'Extra Calculation'):Text(''),
 
-          expenses.isNotEmpty?Table.fromTextArray(
+          extras.isNotEmpty?Table.fromTextArray(
               context: context,
-              data: expenseListTable(expenses)):Text(''),
-          expenses.isNotEmpty?Text('\nTotal Expense Amount: ${Calculations().calculateExpenseTotal(expenses).toStringAsFixed(2)}'):Text(''),
+              data: expenseListTable(extras)):Text(''),
+          extras.isNotEmpty?Text('\nTotal Extras Amount: ${Calculations().calculateExtraTotal(extras).toStringAsFixed(2)}'):Text(''),
 
-            (readings.isNotEmpty||credits.isNotEmpty||expenses.isNotEmpty)?Header(level: 1,text: 'Total'):Text(''),
-          (readings.isNotEmpty||credits.isNotEmpty||expenses.isNotEmpty)?Table.fromTextArray(context: context, data:  <List<String>>[
+            (readings.isNotEmpty||credits.isNotEmpty||extras.isNotEmpty)?Header(level: 1,text: 'Total'):Text(''),
+          (readings.isNotEmpty||credits.isNotEmpty||extras.isNotEmpty)?Table.fromTextArray(context: context, data:  <List<String>>[
             <String>['Type', 'Amount'],
             <String>['Reading Sales', '${Calculations().calculateReadingTotal(readings).toStringAsFixed(2)}'],
-            <String>['-Credit Sales', '${Calculations().calculateCreditTotal(credits).toStringAsFixed(2)}'],
-            <String>['-Expense', '${Calculations().calculateExpenseTotal(expenses).toStringAsFixed(2)}'],
-            <String>['Total', '${Calculations().calculateTotal(readings,expenses,credits).toStringAsFixed(2)}'],
+            <String>['Credit Sales', '${Calculations().calculateCreditTotal(credits).toStringAsFixed(2)}'],
+            <String>['Extras', '${Calculations().calculateExtraTotal(extras).toStringAsFixed(2)}'],
+            <String>['Total', '${Calculations().calculateTotal(readings,extras,credits).toStringAsFixed(2)}'],
           ]):Text('')
         ]));
     await Printing.layoutPdf(
@@ -132,7 +132,7 @@ class PDFPrint {
   }
 
   List<List<String>> expenseListTable(
-      List<Expense> expenseList)  {
+      List<Extra> expenseList)  {
     List<List<String>> listString = new List();
     List<String> heading = [
       'S.No',

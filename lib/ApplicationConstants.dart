@@ -9,6 +9,7 @@ abstract class ApplicationConstants {
   static const String defaultCurrency = "Rs";
   static const double qrPrintSizeInA4Paper = 150;
   static String backColor = 'DCDCDC';
+  static String mainTips = 'Select reading calculation or credit sales calculation or extra income/expense and enter the values to add them\n\nTotal = Reading - Credit + Extra';
   static String fbTestingId = '6eb7ed33-f3eb-47e6-9212-59718255c2c2';
 
 

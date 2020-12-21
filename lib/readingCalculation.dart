@@ -142,7 +142,7 @@ class _readingCalculationState extends State<readingCalculation> {
                 });
               },
             ),
-            Text('Total: ${total.toStringAsFixed(2)}'),
+            // Text('Total: ${total.toStringAsFixed(2)}'),
           ],
         ),
       ),

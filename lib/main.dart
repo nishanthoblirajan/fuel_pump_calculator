@@ -11,16 +11,16 @@ import 'package:share/share.dart';
 
 import 'ApplicationConstants.dart';
 import 'DataClass/Credit.dart';
-import 'DataClass/Expense.dart';
+import 'DataClass/Extra.dart';
 import 'DataClass/Reading.dart';
 import 'HexColor.dart';
-import 'expenseCalculation.dart';
+import 'extraCalculation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
 List<Credit> creditList = new List();
-List<Expense> expenseList = new List();
+List<Extra> expenseList = new List();
 List<Reading> readingList = new List();
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
@@ -251,7 +251,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   RaisedButton(
                     child: Text(
-                      'Credit Sale',
+                      'Credit',
                     ),
                     onPressed: () {
                       showDialog(
@@ -265,7 +265,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   RaisedButton(
                     child: Text(
-                      'Expense',
+                      'Extra',
                     ),
                     onPressed: () {
                       showDialog(
@@ -280,7 +280,10 @@ class _MyAppState extends State<MyApp> {
                 ],
               ),
 
-              Center(child: displayTotalAmount()),
+              (readingList.isNotEmpty||creditList.isNotEmpty||expenseList.isNotEmpty)?Center(child: displayTotalAmount()):Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(ApplicationConstants.mainTips,style: TextStyle(color: Colors.blueGrey,fontStyle: FontStyle.italic),),
+              ),
 
               readingList.isNotEmpty ? displayData('Reading',  Calculations().calculateReadingTotal(readingList)): Text(''),
               readingList.isNotEmpty ? buildReadingList() : Text(''),
@@ -309,7 +312,7 @@ class _MyAppState extends State<MyApp> {
               //       }),
               // )
 
-              expenseList.isNotEmpty ? displayData('Expense',  Calculations().calculateExpenseTotal(expenseList)) : Text(''),
+              expenseList.isNotEmpty ? displayData('Extras',  Calculations().calculateExtraTotal(expenseList)) : Text(''),
               expenseList.isNotEmpty ? buildExpenseList() : Text(''),
               // Expanded(
               //   child: new ListView.builder(
