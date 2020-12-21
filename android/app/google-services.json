@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "692252022320",
+    "project_id": "fuel-pump-calculator",
+    "storage_bucket": "fuel-pump-calculator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:692252022320:android:3ad554189846ee0da17ff5",
+        "android_client_info": {
+          "package_name": "zaptrapp.fuel_pump_calculator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "692252022320-7d1assr9blvo32v2phu2m21pkqr75j44.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS18BbEOJeq9lXLHUAPFGbnqyTEeaVV-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "692252022320-7d1assr9blvo32v2phu2m21pkqr75j44.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

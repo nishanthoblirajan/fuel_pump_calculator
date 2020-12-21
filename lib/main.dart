@@ -12,16 +12,29 @@ import 'DataClass/Credit.dart';
 import 'DataClass/Expense.dart';
 import 'DataClass/Reading.dart';
 import 'expenseCalculation.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 List<Credit> creditList = new List();
 List<Expense> expenseList = new List();
 List<Reading> readingList = new List();
-void main() => runApp(GetMaterialApp(
-      home: MyApp(),
-      debugShowCheckedModeBanner: false,
-      title: 'Pump Calculator',
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'OpenSans'),
-    ));
+
+FirebaseAnalytics analytics = FirebaseAnalytics();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(GetMaterialApp(
+    navigatorObservers: [
+      FirebaseAnalyticsObserver(analytics: analytics),
+    ],
+    home: MyApp(),
+    debugShowCheckedModeBanner: false,
+    title: 'Pump Calculator',
+    theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'OpenSans'),
+  ));
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -68,9 +81,29 @@ class _MyAppState extends State<MyApp> {
     num totalToDisplay = 0;
     totalToDisplay =
         Calculations().calculateTotal(readingList, expenseList, creditList);
-    return Text('${totalToDisplay.toStringAsFixed(2)}');
+    return Text('${totalToDisplay.toStringAsFixed(2)}',style: finalAmountStyle(),);
   }
 
+  Widget displayData(String text,num toDisplay){
+    return Container(
+    color: Colors.blueGrey,
+    width:Get.width,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('$text',style:TextStyle(color:Colors.white)),
+            Text('${toDisplay.toStringAsFixed(2)}',textAlign: TextAlign.right,style:TextStyle(color:Colors.white))
+          ],
+        ),
+      ),
+    );
+  }
+  TextStyle finalAmountStyle() {
+    return TextStyle(fontWeight: FontWeight.w900,
+      fontStyle: FontStyle.normal,fontSize: 24,);
+  }
   @override
   Widget build(BuildContext context) {
     FocusNode rateFocus = FocusNode();
@@ -219,15 +252,9 @@ class _MyAppState extends State<MyApp> {
               ],
             ),
 
-            displayTotalAmount(),
+            Center(child: displayTotalAmount()),
 
-            readingList.isNotEmpty ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Reading'),
-                Text('${Calculations().calculateReadingTotal(readingList)}')
-              ],
-            ) : Text(''),
+            readingList.isNotEmpty ? displayData('Reading',  Calculations().calculateReadingTotal(readingList)): Text(''),
             readingList.isNotEmpty ? buildReadingList() : Text(''),
 
             // Expanded(
@@ -240,13 +267,8 @@ class _MyAppState extends State<MyApp> {
             //       }),
             // ),
 
-            creditList.isNotEmpty ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Credit'),
-                Text('${Calculations().calculateCreditTotal(creditList)}')
-              ],
-            )  : Text(''),
+            creditList.isNotEmpty ?displayData('Credit',  Calculations().calculateCreditTotal(creditList))
+          : Text(''),
             creditList.isNotEmpty ? buildCreditList() : Text(''),
 
             // Expanded(
@@ -259,13 +281,7 @@ class _MyAppState extends State<MyApp> {
             //       }),
             // )
 
-            expenseList.isNotEmpty ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Expense'),
-                Text('${Calculations().calculateExpenseTotal(expenseList)}')
-              ],
-            )  : Text(''),
+            expenseList.isNotEmpty ? displayData('Expense',  Calculations().calculateExpenseTotal(expenseList)) : Text(''),
             expenseList.isNotEmpty ? buildExpenseList() : Text(''),
             // Expanded(
             //   child: new ListView.builder(
