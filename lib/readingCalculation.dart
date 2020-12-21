@@ -138,7 +138,7 @@ class _readingCalculationState extends State<readingCalculation> {
                       startingReadingController,
                       endingReadingController,
                       rateController);
-                  Get.back();
+                  Get.offAll(MyApp());
                 });
               },
             ),

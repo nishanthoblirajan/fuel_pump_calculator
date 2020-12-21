@@ -85,12 +85,12 @@ class _MyAppState extends State<MyApp> {
           'Pump Calculator',
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {});
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.refresh),
+          //   onPressed: () {
+          //     setState(() {});
+          //   },
+          // ),
           !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
               ? IconButton(
                   icon: Icon(Icons.delete),
@@ -221,7 +221,13 @@ class _MyAppState extends State<MyApp> {
 
             displayTotalAmount(),
 
-            readingList.isNotEmpty ? Text('Reading') : Text(''),
+            readingList.isNotEmpty ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Reading'),
+                Text('${Calculations().calculateReadingTotal(readingList)}')
+              ],
+            ) : Text(''),
             readingList.isNotEmpty ? buildReadingList() : Text(''),
 
             // Expanded(
@@ -234,7 +240,13 @@ class _MyAppState extends State<MyApp> {
             //       }),
             // ),
 
-            creditList.isNotEmpty ? Text('Credit') : Text(''),
+            creditList.isNotEmpty ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Credit'),
+                Text('${Calculations().calculateCreditTotal(creditList)}')
+              ],
+            )  : Text(''),
             creditList.isNotEmpty ? buildCreditList() : Text(''),
 
             // Expanded(
@@ -247,7 +259,13 @@ class _MyAppState extends State<MyApp> {
             //       }),
             // )
 
-            expenseList.isNotEmpty ? Text('Expense') : Text(''),
+            expenseList.isNotEmpty ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Expense'),
+                Text('${Calculations().calculateExpenseTotal(expenseList)}')
+              ],
+            )  : Text(''),
             expenseList.isNotEmpty ? buildExpenseList() : Text(''),
             // Expanded(
             //   child: new ListView.builder(

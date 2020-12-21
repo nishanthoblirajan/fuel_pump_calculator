@@ -89,7 +89,6 @@ class Calculations {
     for(int i=0;i<credits.length;i++){
       shareString+=shareCredit((i+1).toString(), credits[i]);
     }
-
     if(credits.isNotEmpty){
       shareString+='*Credits Total: ${calculateCreditTotal(credits).toStringAsFixed(2)}*\n-------\n';
     }
