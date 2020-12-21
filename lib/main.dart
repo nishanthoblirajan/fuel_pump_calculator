@@ -3,14 +3,17 @@ import 'dart:math';
 import 'package:facebook_audience_network/facebook_audience_network.dart';
 import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
+import 'package:fuel_pump_calculator/PDFPrint.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:fuel_pump_calculator/readingCalculation.dart';
 import 'package:get/get.dart';
 import 'package:share/share.dart';
 
+import 'ApplicationConstants.dart';
 import 'DataClass/Credit.dart';
 import 'DataClass/Expense.dart';
 import 'DataClass/Reading.dart';
+import 'HexColor.dart';
 import 'expenseCalculation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -22,18 +25,40 @@ List<Reading> readingList = new List();
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  FacebookAudienceNetwork.init(
+    testingId: "2c870386-66ee-4a9f-a9b7-0a0ef7a5bd13", //optional
+  );
+
+  Firebase.initializeApp();
+
   runApp(GetMaterialApp(
-    navigatorObservers: [
-      FirebaseAnalyticsObserver(analytics: analytics),
-    ],
-    home: MyApp(),
-    debugShowCheckedModeBanner: false,
-    title: 'Pump Calculator',
-    theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'OpenSans'),
-  ));
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: analytics),
+      ],
+      title: 'Fuel Pump Calculator',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: HexColor(ApplicationConstants.mainColor),
+        // textTheme: GoogleFonts.loraTextTheme(),
+        // primaryTextTheme: TextTheme(
+        //   headline6: GoogleFonts.lora(
+        //     fontWeight: FontWeight.w600,
+        //   ),
+        // ),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: HexColor(ApplicationConstants.mainColor),
+
+        // primaryTextTheme: TextTheme(
+        //   headline6: GoogleFonts.lora(
+        //     fontWeight: FontWeight.w600,
+        //   ),
+        // )
+
+      ),home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -49,9 +74,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    FacebookAudienceNetwork.init(
-      testingId: "6ee3cda2-63d3-4ba1-ad4b-06fc346f7d5e",
-    );
     rateInputController = new TextEditingController();
     openingReadingController = new TextEditingController();
     closingReadingController = new TextEditingController();
@@ -106,194 +128,200 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
-    FocusNode rateFocus = FocusNode();
-    FocusNode openingReadingFocus = FocusNode();
-    FocusNode closingReadingFocus = FocusNode();
+
 
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      appBar: AppBar(
-        centerTitle: true,
-        title: new Text(
-          'Pump Calculator',
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+          centerTitle: true,
+          title: new Text(
+            'Pump Calculator',
+          ),
+          actions: [
+            // IconButton(
+            //   icon: Icon(Icons.refresh),
+            //   onPressed: () {
+            //     setState(() {});
+            //   },
+            // ),
+            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+                ? IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Confirmation'),
+                              content: Text('Clear all data?'),
+                              actions: [
+                                FlatButton(
+                                  child: Text(
+                                    'No',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text(
+                                    'Yes',
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      readingList.clear();
+                                      expenseList.clear();
+                                      creditList.clear();
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                  )
+                : Container(),
+            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+                ? IconButton(
+              icon: Icon(Icons.download_sharp),
+              onPressed: () {
+                PDFPrint().pdfTotal(readingList, creditList, expenseList);
+              },
+            )
+                : Container(),
+            !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
+                ? IconButton(
+                    icon: Icon(Icons.share),
+                    onPressed: () {
+                      setState(() {
+                        Calculations()
+                            .share(readingList, expenseList, creditList);
+                      });
+                    },
+                  )
+                : Container(),
+          ],
         ),
-        actions: [
-          // IconButton(
-          //   icon: Icon(Icons.refresh),
-          //   onPressed: () {
-          //     setState(() {});
-          //   },
-          // ),
-          !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
-              ? IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Confirmation'),
-                            content: Text('Clear all data?'),
-                            actions: [
-                              FlatButton(
-                                child: Text(
-                                  'No',
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              FlatButton(
-                                child: Text(
-                                  'Yes',
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    readingList.clear();
-                                    expenseList.clear();
-                                    creditList.clear();
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        });
-                  },
-                )
-              : Container(),
-          !(readingList.isEmpty && expenseList.isEmpty && creditList.isEmpty)
-              ? IconButton(
-                  icon: Icon(Icons.share),
-                  onPressed: () {
-                    setState(() {
-                      Calculations()
-                          .share(readingList, expenseList, creditList);
-                    });
-                  },
-                )
-              : Container(),
-        ],
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Container(
-            //   alignment: Alignment(0.5, 1),
-            //   child: FacebookBannerAd(
-            //     placementId: "2342543822724448_2342544912724339",
-            //     bannerSize: BannerSize.STANDARD,
-            //     listener: (result, value) {
-            //       switch (result) {
-            //         case BannerAdResult.ERROR:
-            //           print("Error: $value");
-            //           break;
-            //         case BannerAdResult.LOADED:
-            //           print("Loaded: $value");
-            //           break;
-            //         case BannerAdResult.CLICKED:
-            //           print("Clicked: $value");
-            //           break;
-            //         case BannerAdResult.LOGGING_IMPRESSION:
-            //           print("Logging Impression: $value");
-            //           break;
-            //       }
-            //     },
-            //   ),
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(
-                  child: Text(
-                    'Reading',
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // Container(
+              //   alignment: Alignment(0.5, 1),
+              //   child: FacebookBannerAd(
+              //     placementId: "2342543822724448_2342544912724339",
+              //     bannerSize: BannerSize.STANDARD,
+              //     listener: (result, value) {
+              //       switch (result) {
+              //         case BannerAdResult.ERROR:
+              //           print("Error: $value");
+              //           break;
+              //         case BannerAdResult.LOADED:
+              //           print("Loaded: $value");
+              //           break;
+              //         case BannerAdResult.CLICKED:
+              //           print("Clicked: $value");
+              //           break;
+              //         case BannerAdResult.LOGGING_IMPRESSION:
+              //           print("Logging Impression: $value");
+              //           break;
+              //       }
+              //     },
+              //   ),
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RaisedButton(
+                    child: Text(
+                      'Reading',
+                    ),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return readingCalculation(
+                              dialog: true,
+                            );
+                          });
+                    },
                   ),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext buildContext) {
-                          return readingCalculation(
-                            dialog: true,
-                          );
-                        });
-                  },
-                ),
-                RaisedButton(
-                  child: Text(
-                    'Credit Sale',
+                  RaisedButton(
+                    child: Text(
+                      'Credit Sale',
+                    ),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return creditCalculation(
+                              dialog: true,
+                            );
+                          });
+                    },
                   ),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext buildContext) {
-                          return creditCalculation(
-                            dialog: true,
-                          );
-                        });
-                  },
-                ),
-                RaisedButton(
-                  child: Text(
-                    'Expense',
+                  RaisedButton(
+                    child: Text(
+                      'Expense',
+                    ),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return expenseCalculation(
+                              dialog: true,
+                            );
+                          });
+                    },
                   ),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext buildContext) {
-                          return expenseCalculation(
-                            dialog: true,
-                          );
-                        });
-                  },
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            Center(child: displayTotalAmount()),
+              Center(child: displayTotalAmount()),
 
-            readingList.isNotEmpty ? displayData('Reading',  Calculations().calculateReadingTotal(readingList)): Text(''),
-            readingList.isNotEmpty ? buildReadingList() : Text(''),
+              readingList.isNotEmpty ? displayData('Reading',  Calculations().calculateReadingTotal(readingList)): Text(''),
+              readingList.isNotEmpty ? buildReadingList() : Text(''),
 
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: readingList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(readingList[index].toString());
-            //       }),
-            // ),
+              // Expanded(
+              //   child: new ListView.builder(
+              //       shrinkWrap: true,
+              //       scrollDirection: Axis.horizontal,
+              //       itemCount: readingList.length,
+              //       itemBuilder: (BuildContext context, int index) {
+              //         return new Text(readingList[index].toString());
+              //       }),
+              // ),
 
-            creditList.isNotEmpty ?displayData('Credit',  Calculations().calculateCreditTotal(creditList))
-          : Text(''),
-            creditList.isNotEmpty ? buildCreditList() : Text(''),
+              creditList.isNotEmpty ?displayData('Credit',  Calculations().calculateCreditTotal(creditList))
+            : Text(''),
+              creditList.isNotEmpty ? buildCreditList() : Text(''),
 
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: creditList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(creditList[index].toString());
-            //       }),
-            // )
+              // Expanded(
+              //   child: new ListView.builder(
+              //       shrinkWrap: true,
+              //       scrollDirection: Axis.horizontal,
+              //       itemCount: creditList.length,
+              //       itemBuilder: (BuildContext context, int index) {
+              //         return new Text(creditList[index].toString());
+              //       }),
+              // )
 
-            expenseList.isNotEmpty ? displayData('Expense',  Calculations().calculateExpenseTotal(expenseList)) : Text(''),
-            expenseList.isNotEmpty ? buildExpenseList() : Text(''),
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: expenseList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(expenseList[index].toString());
-            //       }),
-            // ),
+              expenseList.isNotEmpty ? displayData('Expense',  Calculations().calculateExpenseTotal(expenseList)) : Text(''),
+              expenseList.isNotEmpty ? buildExpenseList() : Text(''),
+              // Expanded(
+              //   child: new ListView.builder(
+              //       shrinkWrap: true,
+              //       scrollDirection: Axis.horizontal,
+              //       itemCount: expenseList.length,
+              //       itemBuilder: (BuildContext context, int index) {
+              //         return new Text(expenseList[index].toString());
+              //       }),
+              // ),
 
-            /*Old Code */
+              /*Old Code */
 //           Container(
 //             child: Padding(
 //               padding: const EdgeInsets.all(12.0),
@@ -378,9 +406,9 @@ class _MyAppState extends State<MyApp> {
 //               )),
 //             ),
 //           ),
-          ],
+            ],
+          ),
         ),
-      ),
     );
   }
 
