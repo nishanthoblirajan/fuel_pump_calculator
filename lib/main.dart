@@ -237,7 +237,7 @@ class _MyAppState extends State<MyApp> {
       print('No Credit saved');
     }
 
-    Fluttertoast.showToast(msg: 'Retrieved');
+    // Fluttertoast.showToast(msg: 'Retrieved');
   }
 
   @override
