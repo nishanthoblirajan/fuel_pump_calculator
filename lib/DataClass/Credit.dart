@@ -42,7 +42,13 @@ class Credit {
 
   String toJson() => json.encode(toMap());
 
-  factory Credit.fromJson(String source) => Credit.fromMap(json.decode(source));
+  factory Credit.fromJson(dynamic json){
+    Credit credit = new Credit();
+    credit.description=json["description"] as String;
+    credit.litre = json["litre"] as num;
+    credit.rate = json["rate"] as num;
+    return credit;
+  }
 
   num credit(num litre, num rate) {
     return litre * rate;

@@ -36,8 +36,14 @@ class Extra {
 
   String toJson() => json.encode(toMap());
 
-  factory Extra.fromJson(String source) =>
-      Extra.fromMap(json.decode(source));
+  factory Extra.fromJson(dynamic json){
+    Extra extra = new Extra();
+    extra.description=json["description"] as String;
+    extra.amount = json["amount"] as num;
+    return extra;
+
+
+  }
 
   @override
   String toString() =>

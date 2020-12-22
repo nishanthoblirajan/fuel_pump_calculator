@@ -48,8 +48,14 @@ class Reading {
 
   String toJson() => json.encode(toMap());
 
-  factory Reading.fromJson(String source) =>
-      Reading.fromMap(json.decode(source));
+  factory Reading.fromJson(dynamic json) {
+    Reading reading = new Reading();
+    reading.description=json["description"] as String;
+    reading.startingReading=json["startingReading"] as num;
+    reading.endingReading = json["endingReading"] as num;
+    reading.rate = json["rate"] as num;
+    return reading;
+  }
 
   num reading(num starting, num ending, num rate) {
     return (ending - starting) * rate;

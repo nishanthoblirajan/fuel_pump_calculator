@@ -60,8 +60,8 @@ void main() {
         //     fontWeight: FontWeight.w600,
         //   ),
         // )
-
-      ),home: MyApp()));
+      ),
+      home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -106,80 +106,161 @@ class _MyAppState extends State<MyApp> {
     num totalToDisplay = 0;
     totalToDisplay =
         Calculations().calculateTotal(readingList, extraList, creditList);
-    return Text('${totalToDisplay.toStringAsFixed(2)}',style: finalAmountStyle(),);
+    return Text(
+      '${totalToDisplay.toStringAsFixed(2)}',
+      style: finalAmountStyle(),
+    );
   }
 
-  Widget displayData(String text,num toDisplay){
+  Widget displayData(String text, num toDisplay) {
     return Container(
-    color: Colors.blueGrey,
-    width:Get.width,
+      color: Colors.blueGrey,
+      width: Get.width,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('$text',style:TextStyle(color:Colors.white)),
-            Text('${toDisplay.toStringAsFixed(2)}',textAlign: TextAlign.right,style:TextStyle(color:Colors.white))
+            Text('$text', style: TextStyle(color: Colors.white)),
+            Text('${toDisplay.toStringAsFixed(2)}',
+                textAlign: TextAlign.right,
+                style: TextStyle(color: Colors.white))
           ],
         ),
       ),
     );
   }
+
   TextStyle finalAmountStyle() {
-    return TextStyle(fontWeight: FontWeight.w900,
-      fontStyle: FontStyle.normal,fontSize: 24,);
+    return TextStyle(
+      fontWeight: FontWeight.w900,
+      fontStyle: FontStyle.normal,
+      fontSize: 24,
+    );
   }
 
-
   /*todo save operation*/
-  // saveAll() async {
-  //   // ignore: unnecessary_statements
-  //   readingList.isNotEmpty?await Preferences().setReadings(readingList.toJson()):null;
-  //   creditList.isNotEmpty?await Preferences().setCredits(creditList.toString()):null;
-  //   extraList.isNotEmpty?await Preferences().setExtras(extraList.toString()):null;
-  //   Fluttertoast.showToast(msg: 'Saved');
-  // }
-  //
-  // retrieveAll() async {
-  //   String readings = await Preferences().getReadings();
-  //   print('reading string is $readings');
-  //   var tagObjsJson = jsonDecode(readings)['Reading'] as List;
-  //
-  //   List<Reading> tagObjs = tagObjsJson.map((tagJson) => Reading.fromJson(tagJson)).toList();
-  //   print('Readings is ${tagObjs.toString()}');
-  //
-  // }
+  saveAll() async {
+    // ignore: unnecessary_statements
+    readingList.isNotEmpty
+        ? await Preferences().setReadings(jsonEncode(readingList))
+        : null;
+    creditList.isNotEmpty
+        ? await Preferences().setCredits(jsonEncode(creditList))
+        : null;
+    extraList.isNotEmpty
+        ? await Preferences().setExtras(jsonEncode(extraList))
+        : null;
+    Fluttertoast.showToast(msg: 'Saved');
+  }
+
+  retrieveAll() async {
+    /*retieve all values*/
+    setState(() {
+      readingList.clear();
+    });
+    String readings = await Preferences().getReadings();
+    try {
+      print('LENGTH IS -------- ${(json.decode(readings) as List).length}');
+      (json.decode(readings) as List).map((i) {
+        print('i is $i');
+        Reading readingObject = Reading.fromJson(jsonDecode(i));
+        print('readingObject is ${readingObject.toString()}');
+        setState(() {
+          print('readingObject is ${readingObject.toString()}');
+          readingList.add(readingObject);
+        });
+      }).toList();
+    } catch (e) {
+      print('No Readings saved');
+    }
+
+    setState(() {
+      creditList.clear();
+    });
+    String credits = await Preferences().getCredits();
+    try {
+      print('LENGTH IS -------- ${(json.decode(credits) as List).length}');
+      (json.decode(credits) as List).map((i) {
+        print('i is $i');
+        Credit creditObject = Credit.fromJson(jsonDecode(i));
+        print('creditObject is ${creditObject.toString()}');
+        setState(() {
+          print('creditObject is ${creditObject.toString()}');
+          creditList.add(creditObject);
+        });
+      }).toList();
+    } catch (e) {
+      print('No Credit saved');
+    }
+
+    setState(() {
+      extraList.clear();
+    });
+    String extras = await Preferences().getExtras();
+    try {
+      print('LENGTH IS -------- ${(json.decode(extras) as List).length}');
+      (json.decode(extras) as List).map((i) {
+        print('i is $i');
+        Extra extraObject = Extra.fromJson(jsonDecode(i));
+        print('extraObject is ${extraObject.toString()}');
+        setState(() {
+          print('extraObject is ${extraObject.toString()}');
+          extraList.add(extraObject);
+        });
+      }).toList();
+    } catch (e) {
+      print('No Credit saved');
+    }
+
+    Fluttertoast.showToast(msg: 'Retrieved');
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          centerTitle: true,
-          title: new Text(
-            'Pump Calculator',
-          ),
-          // leading: !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-          //     ? IconButton(
-          //   icon: Icon(Icons.save),
-          //   onPressed: () {
-          //     // saveAll();
-          //     // retrieveAll();
-          //
-          //   },
-          // )
-          //     : Container(),
-          actions: [
-            // IconButton(
-            //   icon: Icon(Icons.refresh),
-            //   onPressed: () {
-            //     setState(() {});
-            //   },
-            // ),
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        centerTitle: true,
+        title: new Text(
+          'Pump Calculator',
+        ),
+        leading:
             !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-                ? IconButton(
+                ? Tooltip(
+              message: 'Save data',
+                  child: IconButton(
+                      icon: Icon(Icons.save),
+                      onPressed: () {
+                        saveAll();
+                        // retrieveAll();
+                      },
+                    ),
+                )
+                : Container(),
+        actions: [
+          // IconButton(
+          //   icon: Icon(Icons.refresh),
+          //   onPressed: () {
+          //     setState(() {});
+          //   },
+          // ),
+          (readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+              ? Tooltip(
+                message: 'Retrieve saved data',
+                child: IconButton(
+                    icon: Icon(Icons.keyboard_return_rounded),
+                    onPressed: () {
+                      // saveAll();
+                      retrieveAll();
+                    },
+                  ),
+              )
+              : Container(),
+          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+              ? Tooltip(
+            message: 'Delete',
+                child: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
                       showDialog(
@@ -214,241 +295,179 @@ class _MyAppState extends State<MyApp> {
                             );
                           });
                     },
-                  )
-                : Container(),
-            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-                ? IconButton(
-              icon: Icon(Icons.download_sharp),
-              onPressed: () {
-                PDFPrint().pdfTotal(readingList, creditList, extraList);
-              },
-            )
-                : Container(),
-            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-                ? IconButton(
+                  ),
+              )
+              : Container(),
+          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+              ? Tooltip(
+            message: 'Print',
+                child: IconButton(
+                    icon: Icon(Icons.print),
+                    onPressed: () {
+                      PDFPrint().pdfTotal(readingList, creditList, extraList);
+                    },
+                  ),
+              )
+              : Container(),
+          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+              ? Tooltip(
+            message: 'Share',
+                child: IconButton(
                     icon: Icon(Icons.share),
                     onPressed: () {
                       setState(() {
-                        Calculations()
-                            .share(readingList, extraList, creditList);
+                        Calculations().share(readingList, extraList, creditList);
                       });
                     },
-                  )
-                : Container(),
-          ],
-        ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                alignment: Alignment(0.5, 1),
-                child: FacebookBannerAd(
-                  placementId: "2342543822724448_2342544912724339",
-                  bannerSize: BannerSize.STANDARD,
-                  listener: (result, value) {
-                    switch (result) {
-                      case BannerAdResult.ERROR:
-                        print("Error: $value");
-                        break;
-                      case BannerAdResult.LOADED:
-                        print("Loaded: $value");
-                        break;
-                      case BannerAdResult.CLICKED:
-                        print("Clicked: $value");
-                        break;
-                      case BannerAdResult.LOGGING_IMPRESSION:
-                        print("Logging Impression: $value");
-                        break;
-                    }
+                  ),
+              )
+              : Container(),
+        ],
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              alignment: Alignment(0.5, 1),
+              child: FacebookBannerAd(
+                placementId: "2342543822724448_2342544912724339",
+                bannerSize: BannerSize.STANDARD,
+                listener: (result, value) {
+                  switch (result) {
+                    case BannerAdResult.ERROR:
+                      print("Error: $value");
+                      break;
+                    case BannerAdResult.LOADED:
+                      print("Loaded: $value");
+                      break;
+                    case BannerAdResult.CLICKED:
+                      print("Clicked: $value");
+                      break;
+                    case BannerAdResult.LOGGING_IMPRESSION:
+                      print("Logging Impression: $value");
+                      break;
+                  }
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RaisedButton(
+                  child: Text(
+                    'Reading',
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return readingCalculation(
+                            dialog: true,
+                          );
+                        });
                   },
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  RaisedButton(
-                    child: Text(
-                      'Reading',
-                    ),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext buildContext) {
-                            return readingCalculation(
-                              dialog: true,
-                            );
-                          });
-                    },
+                RaisedButton(
+                  child: Text(
+                    'Credit',
                   ),
-                  RaisedButton(
-                    child: Text(
-                      'Credit',
-                    ),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext buildContext) {
-                            return creditCalculation(
-                              dialog: true,
-                            );
-                          });
-                    },
+                  onPressed: () {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return creditCalculation(
+                            dialog: true,
+                          );
+                        });
+                  },
+                ),
+                RaisedButton(
+                  child: Text(
+                    'Extra',
                   ),
-                  RaisedButton(
+                  onPressed: () {
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext buildContext) {
+                          return expenseCalculation(
+                            dialog: true,
+                          );
+                        });
+                  },
+                ),
+              ],
+            ),
+
+            (readingList.isNotEmpty ||
+                    creditList.isNotEmpty ||
+                    extraList.isNotEmpty)
+                ? Center(child: displayTotalAmount())
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Extra',
+                      ApplicationConstants.mainTips,
+                      style: TextStyle(
+                          color: Colors.blueGrey, fontStyle: FontStyle.italic),
                     ),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext buildContext) {
-                            return expenseCalculation(
-                              dialog: true,
-                            );
-                          });
-                    },
                   ),
-                ],
-              ),
 
-              (readingList.isNotEmpty||creditList.isNotEmpty||extraList.isNotEmpty)?Center(child: displayTotalAmount()):Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(ApplicationConstants.mainTips,style: TextStyle(color: Colors.blueGrey,fontStyle: FontStyle.italic),),
-              ),
+            readingList.isNotEmpty
+                ? displayData('Reading',
+                    Calculations().calculateReadingTotal(readingList))
+                : Text(''),
+            readingList.isNotEmpty ? buildReadingList() : Text(''),
 
-              readingList.isNotEmpty ? displayData('Reading',  Calculations().calculateReadingTotal(readingList)): Text(''),
-              readingList.isNotEmpty ? buildReadingList() : Text(''),
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: readingList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(readingList[index].toString());
+            //       }),
+            // ),
 
-              // Expanded(
-              //   child: new ListView.builder(
-              //       shrinkWrap: true,
-              //       scrollDirection: Axis.horizontal,
-              //       itemCount: readingList.length,
-              //       itemBuilder: (BuildContext context, int index) {
-              //         return new Text(readingList[index].toString());
-              //       }),
-              // ),
+            creditList.isNotEmpty
+                ? displayData(
+                    'Credit', Calculations().calculateCreditTotal(creditList))
+                : Text(''),
+            creditList.isNotEmpty ? buildCreditList() : Text(''),
 
-              creditList.isNotEmpty ?displayData('Credit',  Calculations().calculateCreditTotal(creditList))
-            : Text(''),
-              creditList.isNotEmpty ? buildCreditList() : Text(''),
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: creditList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(creditList[index].toString());
+            //       }),
+            // )
 
-              // Expanded(
-              //   child: new ListView.builder(
-              //       shrinkWrap: true,
-              //       scrollDirection: Axis.horizontal,
-              //       itemCount: creditList.length,
-              //       itemBuilder: (BuildContext context, int index) {
-              //         return new Text(creditList[index].toString());
-              //       }),
-              // )
-
-              extraList.isNotEmpty ? displayData('Extras',  Calculations().calculateExtraTotal(extraList)) : Text(''),
-              extraList.isNotEmpty ? buildExpenseList() : Text(''),
-              // Expanded(
-              //   child: new ListView.builder(
-              //       shrinkWrap: true,
-              //       scrollDirection: Axis.horizontal,
-              //       itemCount: expenseList.length,
-              //       itemBuilder: (BuildContext context, int index) {
-              //         return new Text(expenseList[index].toString());
-              //       }),
-              // ),
-
-              /*Old Code */
-//           Container(
-//             child: Padding(
-//               padding: const EdgeInsets.all(12.0),
-//               child: Container(
-//                   child: Column(
-//                 children: <Widget>[
-//                   Container(
-//                     child: new Row(
-//                       children: <Widget>[
-// //                    2342543822724448_2342544912724339
-
-//                         Expanded(
-//                           child: RaisedButton(
-//                             onPressed: () {
-//                               setState(() {
-//                                 _selectedProducts = 'MS';
-//                               });
-//                             },
-//                             child: new Text('MS'),
-//                           ),
-//                         ),
-//                         Expanded(
-//                           child: RaisedButton(
-//                             onPressed: () {
-//                               setState(() {
-//                                 _selectedProducts = 'HSD';
-//                               });
-//                             },
-//                             child: new Text('HSD'),
-//                           ),
-//                         )
-//                       ],
-//                     ),
-//                   ),
-//                   Text(
-//                     _selectedProducts,
-//                     style: TextStyle(
-//                       fontSize: 20.0,
-//                     ),
-//                   ),
-//                   TextFormField(
-//                     keyboardType: TextInputType.number,
-//                     controller: rateInputController,
-//                     textInputAction: TextInputAction.next,
-//                     focusNode: rateFocus,
-//                     onFieldSubmitted: (term) {
-//                       _fieldFocusChange(
-//                           context, rateFocus, openingReadingFocus);
-//                     },
-//                     decoration: InputDecoration(labelText: 'Price/Litre'),
-//                   ),
-//                   TextFormField(
-//                     keyboardType: TextInputType.number,
-//                     controller: openingReadingController,
-//                     textInputAction: TextInputAction.next,
-//                     focusNode: openingReadingFocus,
-//                     onFieldSubmitted: (term) {
-//                       _fieldFocusChange(
-//                           context, openingReadingFocus, closingReadingFocus);
-//                     },
-//                     decoration: InputDecoration(labelText: 'Opening Reading'),
-//                   ),
-//                   TextFormField(
-//                     keyboardType: TextInputType.number,
-//                     controller: closingReadingController,
-//                     textInputAction: TextInputAction.done,
-//                     focusNode: closingReadingFocus,
-//                     onFieldSubmitted: (term) {
-//                       closingReadingFocus.unfocus();
-//                       calculate();
-//                     },
-//                     decoration: InputDecoration(labelText: 'Closing Reading'),
-//                   ),
-//                   new RaisedButton(
-//                     onPressed: () {
-//                       calculate();
-//                     },
-//                     child: Text('Calculate'),
-//                   ),
-//                   total
-//                 ],
-//               )),
-//             ),
-//           ),
-            ],
-          ),
+            extraList.isNotEmpty
+                ? displayData(
+                    'Extras', Calculations().calculateExtraTotal(extraList))
+                : Text(''),
+            extraList.isNotEmpty ? buildExpenseList() : Text(''),
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: expenseList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(expenseList[index].toString());
+            //       }),
+            // ),
+          ],
         ),
+      ),
     );
   }
-
   SingleChildScrollView buildReadingList() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
