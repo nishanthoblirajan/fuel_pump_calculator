@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:facebook_audience_network/facebook_audience_network.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
@@ -18,9 +21,6 @@ import 'DataClass/Reading.dart';
 import 'HexColor.dart';
 import 'Preferences.dart';
 import 'extraCalculation.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 
 List<Credit> creditList = new List();
 List<Extra> extraList = new List();
@@ -75,6 +75,8 @@ class _MyAppState extends State<MyApp> {
   TextEditingController closingReadingController;
   String _selectedProducts = ''; // Option 2
 
+  bool valuesSaved = false;
+
   @override
   void initState() {
     rateInputController = new TextEditingController();
@@ -85,6 +87,28 @@ class _MyAppState extends State<MyApp> {
     closingReadingController.text = '';
 
     _selectedProducts = 'MS';
+
+    Preferences().getReadings().then((value) {
+      if (value != null) {
+        setState(() {
+          valuesSaved = valuesSaved | true;
+        });
+      }
+    });
+    Preferences().getCredits().then((value) {
+      if (value != null) {
+        setState(() {
+          valuesSaved = valuesSaved | true;
+        });
+      }
+    });
+    Preferences().getExtras().then((value) {
+      if (value != null) {
+        setState(() {
+          valuesSaved = valuesSaved | true;
+        });
+      }
+    });
     super.initState();
   }
 
@@ -221,23 +245,9 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        centerTitle: true,
         title: new Text(
           'Pump Calculator',
         ),
-        leading:
-            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-                ? Tooltip(
-              message: 'Save data',
-                  child: IconButton(
-                      icon: Icon(Icons.save),
-                      onPressed: () {
-                        saveAll();
-                        // retrieveAll();
-                      },
-                    ),
-                )
-                : Container(),
         actions: [
           // IconButton(
           //   icon: Icon(Icons.refresh),
@@ -245,24 +255,60 @@ class _MyAppState extends State<MyApp> {
           //     setState(() {});
           //   },
           // ),
-          (readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
               ? Tooltip(
-                message: 'Retrieve saved data',
-                child: IconButton(
-                    icon: Icon(Icons.keyboard_return_rounded),
-                    onPressed: () {
-                      // saveAll();
-                      retrieveAll();
-                    },
-                  ),
-              )
+            message: 'Save data',
+            child: IconButton(
+              icon: Icon(Icons.save),
+              onPressed: () {
+                saveAll();
+                // retrieveAll();
+              },
+            ),
+          )
               : Container(),
           !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
               ? Tooltip(
-            message: 'Delete',
-                child: IconButton(
-                    icon: Icon(Icons.delete),
+                  message: 'Print',
+                  child: IconButton(
+                    icon: Icon(Icons.print),
                     onPressed: () {
+                      PDFPrint().pdfTotal(readingList, creditList, extraList);
+                    },
+                  ),
+                )
+              : Container(),
+          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
+              ? Tooltip(
+                  message: 'Share',
+                  child: IconButton(
+                    icon: Icon(Icons.share),
+                    onPressed: () {
+                      setState(() {
+                        Calculations()
+                            .share(readingList, extraList, creditList);
+                      });
+                    },
+                  ),
+                )
+              : Container(),
+PopupMenuButton(
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'ret',
+                      child: Text('Retrieve'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'del',
+                      child: Text('Delete'),
+                    ),
+                  ],
+                  onSelected: (String value) {
+                    if (value == 'ret') {
+                      retrieveAll();
+
+                    } else if (value == 'del') {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -294,34 +340,9 @@ class _MyAppState extends State<MyApp> {
                               ],
                             );
                           });
-                    },
-                  ),
-              )
-              : Container(),
-          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-              ? Tooltip(
-            message: 'Print',
-                child: IconButton(
-                    icon: Icon(Icons.print),
-                    onPressed: () {
-                      PDFPrint().pdfTotal(readingList, creditList, extraList);
-                    },
-                  ),
-              )
-              : Container(),
-          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-              ? Tooltip(
-            message: 'Share',
-                child: IconButton(
-                    icon: Icon(Icons.share),
-                    onPressed: () {
-                      setState(() {
-                        Calculations().share(readingList, extraList, creditList);
-                      });
-                    },
-                  ),
-              )
-              : Container(),
+                    }
+                  },
+                )
         ],
       ),
       body: SingleChildScrollView(
@@ -468,6 +489,7 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
   SingleChildScrollView buildReadingList() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
