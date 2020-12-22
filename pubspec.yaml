@@ -27,7 +27,7 @@ dependencies:
   path_provider: ^1.6.24
   printing: ^3.7.2
   fluttertoast: ^7.1.6
-
+  open_file: ^3.0.3
   flutter:
     sdk: flutter
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fuel_pump_calculator/ApplicationConstants.dart';
+import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
@@ -71,10 +72,16 @@ class PDFPrint {
             <String>['Total', '${Calculations().calculateTotal(readings,extras,credits).toStringAsFixed(2)}'],
           ]):Text('')
         ]));
-    await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save());
-    final file = File("/fuelPumpCalculator.pdf");
-    await file.writeAsBytes(pdf.save());
+    // await Printing.layoutPdf(
+    //     onLayout: (PdfPageFormat format) async => pdf.save());
+    // final file = File("/fuelPumpCalculator.pdf");
+    // await file.writeAsBytes(pdf.save());
+
+    final File file = await _localFile;
+    //print('writing to file');
+    file.writeAsBytesSync(pdf.save());
+    OpenFile.open("${file.path}");
+
   }
 
 
