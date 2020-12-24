@@ -31,7 +31,8 @@ FirebaseAnalytics analytics = FirebaseAnalytics();
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FacebookAudienceNetwork.init(
-    testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
+    // testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
+    testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
   );
 
 
@@ -111,12 +112,8 @@ class _MyAppState extends State<MyApp> {
         });
       }
     });
-
     super.initState();
-    // _loadInterstitialAd();
   }
-  bool _isInterstitialAdLoaded = false;
-
   Widget total = Text('Enter Values to calculate');
 
   Widget calculateReadingLitreTotal(num starting, num ending) {
@@ -165,26 +162,6 @@ class _MyAppState extends State<MyApp> {
       fontWeight: FontWeight.w900,
       fontStyle: FontStyle.normal,
       fontSize: 24,
-    );
-  }
-  void _loadInterstitialAd() {
-    FacebookInterstitialAd.loadInterstitialAd(
-      placementId:
-      // "IMG_16_9_APP_INSTALL#2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
-      "2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
-      listener: (result, value) {
-        print(">> FAN > Interstitial Ad: $result --> $value");
-        if (result == InterstitialAdResult.LOADED)
-          _isInterstitialAdLoaded = true;
-
-        /// Once an Interstitial Ad has been dismissed and becomes invalidated,
-        /// load a fresh Ad by calling this function.
-        if (result == InterstitialAdResult.DISMISSED &&
-            value["invalidated"] == true) {
-          _isInterstitialAdLoaded = false;
-          _loadInterstitialAd();
-        }
-      },
     );
   }
 
@@ -298,7 +275,7 @@ class _MyAppState extends State<MyApp> {
                   child: IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-
+                      // _currentAd=_loadInterstitialAd();
 
                       // _loadInterstitialAd();
                       PDFPrint().pdfTotal(readingList, creditList, extraList);

@@ -70,6 +70,30 @@ class _readingCalculationState extends State<readingCalculation> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: <Widget>[
+            // 2342543822724448_2716143078697852
+            Container(
+              alignment: Alignment(0.5, 1),
+              child: FacebookBannerAd(
+                placementId: "2342543822724448_2716143078697852",
+                bannerSize: BannerSize.STANDARD,
+                listener: (result, value) {
+                  switch (result) {
+                    case BannerAdResult.ERROR:
+                      print("Error: $value");
+                      break;
+                    case BannerAdResult.LOADED:
+                      print("Loaded: $value");
+                      break;
+                    case BannerAdResult.CLICKED:
+                      print("Clicked: $value");
+                      break;
+                    case BannerAdResult.LOGGING_IMPRESSION:
+                      print("Logging Impression: $value");
+                      break;
+                  }
+                },
+              ),
+            ),
             new ListTile(
               title: new TextFormField(
                 keyboardType: TextInputType.text,
