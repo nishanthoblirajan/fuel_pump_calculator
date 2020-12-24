@@ -31,8 +31,10 @@ FirebaseAnalytics analytics = FirebaseAnalytics();
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FacebookAudienceNetwork.init(
-    testingId: "2c870386-66ee-4a9f-a9b7-0a0ef7a5bd13", //optional
+    testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
   );
+
+
 
   Firebase.initializeApp();
 
@@ -109,8 +111,11 @@ class _MyAppState extends State<MyApp> {
         });
       }
     });
+
     super.initState();
+    // _loadInterstitialAd();
   }
+  bool _isInterstitialAdLoaded = false;
 
   Widget total = Text('Enter Values to calculate');
 
@@ -162,8 +167,28 @@ class _MyAppState extends State<MyApp> {
       fontSize: 24,
     );
   }
+  void _loadInterstitialAd() {
+    FacebookInterstitialAd.loadInterstitialAd(
+      placementId:
+      // "IMG_16_9_APP_INSTALL#2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
+      "2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
+      listener: (result, value) {
+        print(">> FAN > Interstitial Ad: $result --> $value");
+        if (result == InterstitialAdResult.LOADED)
+          _isInterstitialAdLoaded = true;
 
-  /*todo save operation*/
+        /// Once an Interstitial Ad has been dismissed and becomes invalidated,
+        /// load a fresh Ad by calling this function.
+        if (result == InterstitialAdResult.DISMISSED &&
+            value["invalidated"] == true) {
+          _isInterstitialAdLoaded = false;
+          _loadInterstitialAd();
+        }
+      },
+    );
+  }
+
+  /*todocompleted save operation*/
   saveAll() async {
     // ignore: unnecessary_statements
     readingList.isNotEmpty
@@ -273,6 +298,9 @@ class _MyAppState extends State<MyApp> {
                   child: IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
+
+
+                      // _loadInterstitialAd();
                       PDFPrint().pdfTotal(readingList, creditList, extraList);
                     },
                   ),
@@ -484,6 +512,21 @@ PopupMenuButton(
             //         return new Text(expenseList[index].toString());
             //       }),
             // ),
+            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)?FacebookNativeAd(
+              placementId: "2342543822724448_2716142125364614",
+              adType: NativeAdType.NATIVE_BANNER_AD,
+              bannerAdSize: NativeBannerAdSize.HEIGHT_100,
+              width: double.infinity,
+              backgroundColor: Colors.blue,
+              titleColor: Colors.white,
+              descriptionColor: Colors.white,
+              buttonColor: Colors.deepPurple,
+              buttonTitleColor: Colors.white,
+              buttonBorderColor: Colors.white,
+              listener: (result, value) {
+                print("Native Ad: $result --> $value");
+              },
+            ):Container(),
           ],
         ),
       ),
