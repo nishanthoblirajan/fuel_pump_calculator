@@ -32,7 +32,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FacebookAudienceNetwork.init(
     // testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
-    testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
+    // testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
+    testingId: "fc099c41-f001-48ed-b934-ec87fb91e37d", //optional
   );
 
 
@@ -284,7 +285,7 @@ class _MyAppState extends State<MyApp> {
                               title: Container(
                                 alignment: Alignment(0.5, 1),
                                 child: FacebookBannerAd(
-                                  placementId: "2342543822724448_2342544912724339",
+                                  placementId: "2342543822724448_2716143442031149",
                                   bannerSize: BannerSize.STANDARD,
                                   listener: (result, value) {
                                     switch (result) {
