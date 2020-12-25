@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fuel_pump_calculator/ApplicationConstants.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
@@ -14,7 +15,19 @@ import 'package:path_provider/path_provider.dart';
 import 'Calculations.dart';
 
 class PDFPrint {
-  pdfTotal(List<Reading> readings,List<Credit> credits,List<Extra> extras) async {
+  pdfTotal(List<Reading> readings,List<Credit> credits,List<Extra> extras,String saveAs) async {
+    /*if the file contains . then split it to remove the dot*/
+    if(saveAs.contains('.')){
+      saveAs = saveAs.split('.')[0];
+    }
+
+    /*Get the date*/
+     final DateTime now = DateTime.now();
+     final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+     final DateFormat timeFormat = DateFormat('hh:mm:ss');
+    final String dateFormatted = dateFormat.format(now);
+    final String timeFormatted = timeFormat.format(now);
+
     final Document pdf = Document(deflate: zlib.encode);
 
     pdf.addPage(MultiPage(
@@ -37,7 +50,8 @@ class PDFPrint {
         },
         build: (Context context) => <Widget>[
 
-
+          Paragraph(text: 'Date: $dateFormatted'),
+          Paragraph(text: 'Time: $timeFormatted'),
           /*Reading Table*/
           readings.isNotEmpty?Header(level: 1,text: 'Reading Calculation'):Text(''),
           readings.isNotEmpty?Table.fromTextArray(
@@ -77,7 +91,7 @@ class PDFPrint {
     // final file = File("/fuelPumpCalculator.pdf");
     // await file.writeAsBytes(pdf.save());
 
-    final File file = await _localFile;
+    final File file = await _localFile(saveAs);
     //print('writing to file');
     file.writeAsBytesSync(pdf.save());
     OpenFile.open("${file.path}");
@@ -165,10 +179,10 @@ class PDFPrint {
     return directory.path;
   }
 
-  Future get _localFile async {
+  Future _localFile(String saveAs) async {
     final path = await _localPath;
     //print('Path is $path/document.pdf');
-    return File('$path/document.pdf');
+    return File('$path/$saveAs.pdf');
   }
 
 }

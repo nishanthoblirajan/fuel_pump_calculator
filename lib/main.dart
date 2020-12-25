@@ -242,6 +242,7 @@ class _MyAppState extends State<MyApp> {
     // Fluttertoast.showToast(msg: 'Retrieved');
   }
 
+  TextEditingController saveAsController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -276,9 +277,77 @@ class _MyAppState extends State<MyApp> {
                     icon: Icon(Icons.print),
                     onPressed: () {
                       // _currentAd=_loadInterstitialAd();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Container(
+                                alignment: Alignment(0.5, 1),
+                                child: FacebookBannerAd(
+                                  placementId: "2342543822724448_2342544912724339",
+                                  bannerSize: BannerSize.STANDARD,
+                                  listener: (result, value) {
+                                    switch (result) {
+                                      case BannerAdResult.ERROR:
+                                        print("Error: $value");
+                                        break;
+                                      case BannerAdResult.LOADED:
+                                        print("Loaded: $value");
+                                        break;
+                                      case BannerAdResult.CLICKED:
+                                        print("Clicked: $value");
+                                        break;
+                                      case BannerAdResult.LOGGING_IMPRESSION:
+                                        print("Logging Impression: $value");
+                                        break;
+                                    }
+                                  },
+                                ),
+                              ),
+                              content: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Column(
+                                  children: [
 
-                      // _loadInterstitialAd();
-                      PDFPrint().pdfTotal(readingList, creditList, extraList);
+                                    Text('Enter the document name to be saved as. Leave it empty for default name.'),
+                                    new TextField(
+                                      controller: saveAsController,
+                                      textInputAction: TextInputAction.next,
+                                      decoration: new InputDecoration(
+                                        labelText: "Save as",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                FlatButton(
+                                  child: Text(
+                                    'Cancel',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text(
+                                    'Confirm',
+                                  ),
+                                  onPressed: () {
+                                    if(saveAsController.text!=''){
+                                      PDFPrint().pdfTotal(readingList, creditList, extraList,saveAsController.text);
+
+                                    }else{
+                                      PDFPrint().pdfTotal(readingList, creditList, extraList,'calculations');
+
+                                      // Fluttertoast.showToast(msg: 'Enter valid document name');
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+
                     },
                   ),
                 )
