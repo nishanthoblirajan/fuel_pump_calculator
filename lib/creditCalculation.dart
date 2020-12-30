@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fuel_pump_calculator/DataClass/Credit.dart';
 import 'package:get/get.dart';
 
 import 'Calculations.dart';
@@ -6,24 +7,40 @@ import 'main.dart';
 
 class creditCalculation extends StatefulWidget {
   bool dialog;
-
+  bool edit;
+  int index;
   @override
   _creditCalculationState createState() => _creditCalculationState();
 
-  creditCalculation({Key key, this.dialog}) : super(key: key);
+  creditCalculation({Key key, this.dialog,this.edit,this.index}) : super(key: key);
 }
 
 final _formKey = GlobalKey<FormState>(); // <-
 
 class _creditCalculationState extends State<creditCalculation> {
   bool dialog = false;
+  bool edit = false;
+  int index=-1;
 
+  Credit editCredit = new Credit();
   @override
   void initState() {
     if (widget.dialog != null) {
       dialog = widget.dialog;
     }
-    // TODO: add all the initstate methods
+    if (widget.edit != null) {
+      edit = widget.edit;
+    }
+    if (widget.index != null) {
+      index = widget.index;
+    }
+
+    if(edit&&index!=-1){
+      editCredit=creditList[index];
+      descriptionController.text=editCredit.description;
+      litreController.text=editCredit.litre.toString();
+      rateController.text=editCredit.rate.toString();
+    }
 
     super.initState();
   }
@@ -104,11 +121,12 @@ class _creditCalculationState extends State<creditCalculation> {
           RaisedButton(
             focusNode: buttonFocus,
             child: Text(
-              'Add',
+              edit?'Edit':'Add',
             ),
             onPressed: () {
               setState(() {
-                total = Calculations().creditCalculation(
+                total = edit?Calculations().editCreditCalculation(index,
+                    descriptionController, litreController, rateController):Calculations().creditCalculation(
                     descriptionController, litreController, rateController);
                 Get.offAll(MyApp());
               });

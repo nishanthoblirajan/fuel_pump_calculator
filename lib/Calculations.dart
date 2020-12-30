@@ -213,4 +213,27 @@ class Calculations {
         new Credit(litre: litre, description: description.text, rate: rate));
     return total.round();
   }
+
+  editCreditCalculation(
+      int index,
+      TextEditingController description,
+      TextEditingController litreController,
+      TextEditingController rateController) {
+    num litre = 0;
+    num rate = 0;
+
+    if (litreController.text != '') {
+      litre = num.parse(litreController.text);
+    }
+
+    if (rateController.text != '') {
+      rate = num.parse(rateController.text);
+    }
+
+    num total = litre * rate;
+
+    creditList[index]=
+        new Credit(litre: litre, description: description.text, rate: rate);
+    return total.round();
+  }
 }

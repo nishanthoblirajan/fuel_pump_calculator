@@ -685,6 +685,7 @@ PopupMenuButton(
             DataColumn(label: Expanded(child: Container(child: Text('Rate')))),
             DataColumn(
                 label: Expanded(child: Container(child: Text('Amount')))),
+            DataColumn(label: Expanded(child: Container(child: Text('Edit')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
           rows: List.generate(creditList.length, (index) {
@@ -694,6 +695,24 @@ PopupMenuButton(
               DataCell(Text(creditList[index].rate.toString())),
               DataCell(calculateCreditTotal(
                   creditList[index].litre, creditList[index].rate)),
+              DataCell(
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return creditCalculation(
+                              dialog: true,
+                              edit: true,
+                              index: index,
+                            );
+                          });                    });
+                  },
+                ),
+              ),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.delete),
