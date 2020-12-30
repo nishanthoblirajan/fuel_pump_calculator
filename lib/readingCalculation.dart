@@ -4,24 +4,46 @@ import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:get/get.dart';
 
+import 'DataClass/Reading.dart';
 import 'main.dart';
 
 class readingCalculation extends StatefulWidget {
   bool dialog;
+  bool edit;
+  int index;
 
   @override
   _readingCalculationState createState() => _readingCalculationState();
 
-  readingCalculation({Key key, this.dialog}) : super(key: key);
+  readingCalculation({Key key, this.dialog,this.edit,this.index}) : super(key: key);
 }
 
 class _readingCalculationState extends State<readingCalculation> {
   bool dialog = false;
 
+  bool edit = false;
+  int index=-1;
+
+  Reading editReading = new Reading();
+
   @override
   void initState() {
     if (widget.dialog != null) {
       dialog = widget.dialog;
+    }
+    if (widget.edit != null) {
+      edit = widget.edit;
+    }
+    if (widget.index != null) {
+      index = widget.index;
+    }
+
+    if(edit&&index!=-1){
+      editReading=readingList[index];
+      startingReadingController.text=editReading.startingReading.toString();
+      endingReadingController.text=editReading.endingReading.toString();
+      descriptionController.text=editReading.description;
+      rateController.text=editReading.rate.toString();
     }
 
     super.initState();
@@ -155,11 +177,17 @@ class _readingCalculationState extends State<readingCalculation> {
 
               focusNode: calculateFocus,
               child: Text(
-                'Add',
+                edit?'Edit':'Add',
               ),
               onPressed: () {
                 setState(() {
-                  total = Calculations().readingCalculations(
+
+                  total = edit?Calculations().editReadingCalculation(
+                    index,
+                      descriptionController,
+                      startingReadingController,
+                      endingReadingController,
+                      rateController):Calculations().readingCalculations(
                       descriptionController,
                       startingReadingController,
                       endingReadingController,

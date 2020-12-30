@@ -141,7 +141,38 @@ class Calculations {
 
     return total.round();
   }
+  editReadingCalculation(
+      int index,
+      TextEditingController description,
+      TextEditingController startingReading,
+      TextEditingController endingReading,
+      TextEditingController rateReading) {
+    num starting = 0;
+    num ending = 0;
+    num rate = 0;
 
+    if (startingReading.text != '') {
+      starting = num.parse(startingReading.text);
+    }
+
+    if (endingReading.text != '') {
+      ending = num.parse(endingReading.text);
+    }
+
+    if (rateReading.text != '') {
+      rate = num.parse(rateReading.text);
+    }
+
+    num total = (ending - starting) * rate;
+
+    readingList[index]=new Reading(
+        description: description.text,
+        startingReading: starting,
+        endingReading: ending,
+        rate: rate);
+
+    return total.round();
+  }
   extraCalculation(
     TextEditingController description,
     TextEditingController expenseController,int selection

@@ -596,6 +596,7 @@ PopupMenuButton(
             DataColumn(label: Expanded(child: Container(child: Text('Rate')))),
             DataColumn(
                 label: Expanded(child: Container(child: Text('Amount')))),
+            DataColumn(label: Expanded(child: Container(child: Text('Edit')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
           rows: List.generate(readingList.length, (index) {
@@ -609,6 +610,25 @@ PopupMenuButton(
               DataCell(Text(readingList[index].rate.toString())),
               DataCell(calculateReadingTotal(readingList[index].startingReading,
                   readingList[index].endingReading, readingList[index].rate)),
+              DataCell(
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext buildContext) {
+                            return readingCalculation(
+                              dialog: true,
+                              edit: true,
+                              index: index,
+                            );
+                          });
+                    });
+                  },
+                ),
+              ),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.delete),
