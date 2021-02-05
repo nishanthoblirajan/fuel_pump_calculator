@@ -93,7 +93,7 @@ class PDFPrint {
 
     final File file = await _localFile(saveAs);
     //print('writing to file');
-    file.writeAsBytesSync(pdf.save());
+    file.writeAsBytesSync(await pdf.save());
     OpenFile.open("${file.path}");
 
   }
