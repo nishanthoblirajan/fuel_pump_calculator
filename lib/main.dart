@@ -33,11 +33,6 @@ FirebaseAnalytics analytics = FirebaseAnalytics();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  FacebookAudienceNetwork.init(
-    // testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
-    // testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
-    testingId: "fc099c41-f001-48ed-b934-ec87fb91e37d", //optional
-  );
 
 
   InAppPurchaseConnection.enablePendingPurchases();
@@ -155,9 +150,10 @@ class _MyAppState extends State<MyApp> {
   bool _isInterstitialAdLoaded = false;
 
   void _loadInterstitialAd() {
+
     FacebookInterstitialAd.loadInterstitialAd(
       placementId:
-      "2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
+      "2342543822724448_2777582475887245", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
       listener: (result, value) {
         print(">> FAN > Interstitial Ad: $result --> $value");
         if (result == InterstitialAdResult.LOADED)
@@ -181,6 +177,12 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   void initState() {
+    FacebookAudienceNetwork.init(
+      // testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
+      // testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
+      testingId: "fc099c41-f001-48ed-b934-ec87fb91e37d", //optional
+    );
+
     _loadInterstitialAd();
 
     _initialize();
@@ -375,9 +377,11 @@ class _MyAppState extends State<MyApp> {
             message: 'Save data',
             child: IconButton(
               icon: Icon(Icons.save),
-              onPressed: () {
-                saveAll();
-                // retrieveAll();
+              onPressed: () async {
+                if(!adFree){
+                  _showInterstitialAd();
+                }
+               await saveAll();
               },
             ),
           )
@@ -388,9 +392,7 @@ class _MyAppState extends State<MyApp> {
                   child: IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      if(!adFree){
-                        _showInterstitialAd();
-                      }
+
                       // _currentAd=_loadInterstitialAd();
                       showDialog(
                           context: context,
@@ -496,9 +498,15 @@ PopupMenuButton(
                   ],
                   onSelected: (String value) {
                     if (value == 'ret') {
+                      if(!adFree){
+                        _showInterstitialAd();
+                      }
                       retrieveAll();
 
                     } else if (value == 'del') {
+                      if(!adFree){
+                        _showInterstitialAd();
+                      }
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
