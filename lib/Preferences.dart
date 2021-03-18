@@ -29,4 +29,15 @@ class Preferences{
     return await sharedPreferences.setString('extras', silverRate);
   }
 
+
+  Future<bool> getAdFree() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getBool('ad_free');
+  }
+
+  Future<bool> setAdFree(bool adFree) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.setBool('ad_free', adFree);
+  }
+
 }

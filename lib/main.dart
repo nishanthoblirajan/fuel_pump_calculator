@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -12,6 +13,7 @@ import 'package:fuel_pump_calculator/PDFPrint.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:fuel_pump_calculator/readingCalculation.dart';
 import 'package:get/get.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:share/share.dart';
 
 import 'ApplicationConstants.dart';
@@ -19,6 +21,7 @@ import 'DataClass/Credit.dart';
 import 'DataClass/Extra.dart';
 import 'DataClass/Reading.dart';
 import 'HexColor.dart';
+import 'MenuLayout.dart';
 import 'Preferences.dart';
 import 'extraCalculation.dart';
 
@@ -37,6 +40,7 @@ void main() {
   );
 
 
+  InAppPurchaseConnection.enablePendingPurchases();
 
   Firebase.initializeApp();
 
@@ -74,15 +78,112 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  InAppPurchaseConnection _iap = InAppPurchaseConnection.instance;
+
+  bool _available = true;
+
+  List<ProductDetails> _products = [];
+  List<PurchaseDetails> _purchases = [];
+
+  StreamSubscription _subscription;
+
+  bool adFree=false;
+
+  _getPastPurchases() async {
+    QueryPurchaseDetailsResponse response = await _iap.queryPastPurchases();
+    setState(() {
+      _purchases = response.pastPurchases;
+      print('purchases are ${_purchases.toString()}');
+
+    });
+  }
+  _getProducts() async {
+    Set<String> ids = Set.from([ApplicationConstants.ad_remove_iap]);
+    ProductDetailsResponse response = await _iap.queryProductDetails(ids);
+    setState(() {
+      _products = response.productDetails;
+      print('products are ${_products.toString()}');
+    });
+  }
+  PurchaseDetails _hasPurchased (String productID){
+    print('checking hasPurchased $productID');
+    return _purchases.firstWhere((element) => element.productID==productID,orElse: ()=> null);
+  }
+
+  Future<void> _verifyPurchase() async {
+    PurchaseDetails purchase = _hasPurchased(ApplicationConstants.ad_remove_iap);
+    final pending = !purchase.billingClientPurchase.isAcknowledged;
+    if (pending) {
+      await _iap.completePurchase(purchase);
+    }
+    if(purchase!=null&&purchase.status==PurchaseStatus.purchased&&purchase.billingClientPurchase.isAcknowledged){
+      print('Product already purchased');
+      Preferences().setAdFree(true);
+    }else{
+      Preferences().setAdFree(false);
+
+    }
+  }
+
+  void _initialize() async {
+
+    _available = await _iap.isAvailable();
+    if(_available){
+      await _getProducts();
+      await _getPastPurchases();
+      List<Future> futures = [_getProducts(),_getPastPurchases()];
+      await Future.wait(futures);
+
+      _verifyPurchase();
+
+      _subscription = _iap.purchaseUpdatedStream.listen((data){
+        setState(() {
+          print('NEW PURCHASE');
+          _purchases = data;
+          _verifyPurchase();
+        });
+      });
+
+    }
+  }
   TextEditingController rateInputController;
   TextEditingController openingReadingController;
   TextEditingController closingReadingController;
   String _selectedProducts = ''; // Option 2
 
   bool valuesSaved = false;
+  bool _isInterstitialAdLoaded = false;
 
+  void _loadInterstitialAd() {
+    FacebookInterstitialAd.loadInterstitialAd(
+      placementId:
+      "2342543822724448_2715632962082197", //"IMG_16_9_APP_INSTALL#2312433698835503_2650502525028617" YOUR_PLACEMENT_ID
+      listener: (result, value) {
+        print(">> FAN > Interstitial Ad: $result --> $value");
+        if (result == InterstitialAdResult.LOADED)
+          _isInterstitialAdLoaded = true;
+
+        /// Once an Interstitial Ad has been dismissed and becomes invalidated,
+        /// load a fresh Ad by calling this function.
+        if (result == InterstitialAdResult.DISMISSED &&
+            value["invalidated"] == true) {
+          _isInterstitialAdLoaded = false;
+          _loadInterstitialAd();
+        }
+      },
+    );
+  }
+  _showInterstitialAd() {
+    if (_isInterstitialAdLoaded == true)
+      FacebookInterstitialAd.showInterstitialAd();
+    else
+      print("Interstial Ad not yet loaded!");
+  }
   @override
   void initState() {
+    _loadInterstitialAd();
+
+    _initialize();
     rateInputController = new TextEditingController();
     openingReadingController = new TextEditingController();
     closingReadingController = new TextEditingController();
@@ -91,7 +192,16 @@ class _MyAppState extends State<MyApp> {
     closingReadingController.text = '';
 
     _selectedProducts = 'MS';
-
+    Preferences().getAdFree().then((string) {
+      if (string != null) {
+        setState(() {
+          adFree = string;
+          print('adFree is $adFree');
+        });
+      }else{
+        Preferences().setAdFree(false);
+      }
+    });
     Preferences().getReadings().then((value) {
       if (value != null) {
         setState(() {
@@ -247,7 +357,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      drawer: buildDrawer(context),
+
       appBar: AppBar(
         title: new Text(
           'Pump Calculator',
@@ -277,12 +388,15 @@ class _MyAppState extends State<MyApp> {
                   child: IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
+                      if(!adFree){
+                        _showInterstitialAd();
+                      }
                       // _currentAd=_loadInterstitialAd();
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Container(
+                              title: adFree?Container():Container(
                                 alignment: Alignment(0.5, 1),
                                 child: FacebookBannerAd(
                                   placementId: "2342543822724448_2716143442031149",
@@ -334,7 +448,8 @@ class _MyAppState extends State<MyApp> {
                                   child: Text(
                                     'Confirm',
                                   ),
-                                  onPressed: () {
+                                  onPressed: ()  {
+
                                     if(saveAsController.text!=''){
                                       PDFPrint().pdfTotal(readingList, creditList, extraList,saveAsController.text);
 
@@ -426,7 +541,7 @@ PopupMenuButton(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
+            adFree?Container():Container(
               alignment: Alignment(0.5, 1),
               child: FacebookBannerAd(
                 placementId: "2342543822724448_2342544912724339",

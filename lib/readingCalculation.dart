@@ -5,6 +5,7 @@ import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:get/get.dart';
 
 import 'DataClass/Reading.dart';
+import 'Preferences.dart';
 import 'main.dart';
 
 class readingCalculation extends StatefulWidget {
@@ -19,6 +20,9 @@ class readingCalculation extends StatefulWidget {
 }
 
 class _readingCalculationState extends State<readingCalculation> {
+
+  bool adFree= false;
+
   bool dialog = false;
 
   bool edit = false;
@@ -28,6 +32,14 @@ class _readingCalculationState extends State<readingCalculation> {
 
   @override
   void initState() {
+    Preferences().getAdFree().then((string) {
+      if (string != null) {
+        setState(() {
+          adFree = string;
+          print('adFree is $adFree');
+        });
+      }
+    });
     if (widget.dialog != null) {
       dialog = widget.dialog;
     }
@@ -93,7 +105,7 @@ class _readingCalculationState extends State<readingCalculation> {
         child: Column(
           children: <Widget>[
             // 2342543822724448_2716143078697852
-            Container(
+            adFree?Container():Container(
               alignment: Alignment(0.5, 1),
               child: FacebookBannerAd(
                 placementId: "2342543822724448_2716143078697852",

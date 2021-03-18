@@ -3,9 +3,11 @@
 abstract class ApplicationConstants {
 
 //  static const String mainColor='3c37ad';
+  static String ad_remove_iap = 'ads_remove';
+
   static const String mainColor='1E90FF';
-  static const String versionNumber = "v 1.5.1";
-  static const String copyrightText = "Copyright 2020 \u00a9 ZAPTR";
+  static const String versionNumber = "v 1.5.2";
+  static const String copyrightText = "$versionNumber Copyright 2021 \u00a9 ZAPTR";
   static const String defaultCurrency = "Rs";
   static const double qrPrintSizeInA4Paper = 150;
   static String backColor = 'DCDCDC';
