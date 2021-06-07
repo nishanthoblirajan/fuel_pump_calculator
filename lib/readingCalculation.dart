@@ -51,7 +51,7 @@ class _readingCalculationState extends State<readingCalculation> {
     }
 
     if(edit&&index!=-1){
-      editReading=readingList[index];
+      editReading=mainReadingList[index];
       startingReadingController.text=editReading.startingReading.toString();
       endingReadingController.text=editReading.endingReading.toString();
       descriptionController.text=editReading.description;

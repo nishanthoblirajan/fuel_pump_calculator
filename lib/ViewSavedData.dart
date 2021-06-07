@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/DataClass/Reading.dart';
 import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
+import 'package:fuel_pump_calculator/main.dart';
+import 'package:get/get.dart';
 import 'Calculations.dart';
 import 'DataClass/Credit.dart';
 import 'DataClass/Extra.dart';
@@ -70,47 +72,6 @@ class _ViewSavedDataState extends State<ViewSavedData> {
     /*TODO edit the below list*/
     return Column(
       children: [
-        // ElevatedButton(
-        //   onPressed: () async {
-        //     List<List<String>> data = [
-        //       [
-        //         "Date",
-        //         "Credits",
-        //         "Extras",
-        //         "Readings",
-        //       ],
-        //     ];
-        //     for (var i in savedDataList) {
-        //       SavedData savedData = i;
-        //       print('here is ' + savedData.toString());
-        //       List<Credit> creditList = new List();
-        //       (json.decode(savedData.credits) as List).map((i) {
-        //         print('i is $i');
-        //         Credit credit = Credit.fromJson(jsonDecode(i));
-        //         print('credit is ${credit.toString()}');
-        //         creditList.add(credit);
-        //       }).toList();
-        //       List<Extra> extraList = new List();
-        //       (json.decode(savedData.extras) as List).map((i) {
-        //         print('i is $i');
-        //         Extra extra = Extra.fromJson(jsonDecode(i));
-        //         print('extra is ${extra.toString()}');
-        //         extraList.add(extra);
-        //       }).toList();
-        //
-        //       List<Reading> readingList = new List();
-        //       (json.decode(savedData.readings) as List).map((i) {
-        //         print('i is $i');
-        //         Reading reading = Reading.fromJson(jsonDecode(i));
-        //         print('reading is ${reading.toString()}');
-        //         readingList.add(reading);
-        //       }).toList();
-        //
-        //     }
-        //
-        //   },
-        //   child: Text('Export the data'),
-        // ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
@@ -125,7 +86,9 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                 DataColumn(
                     label: Expanded(child: Container(child: Text('Extras')))),
                 DataColumn(
-                    label: Expanded(child: Container(child: Text('Del')))),
+                    label: Expanded(child: Container(child: Text('Delete')))),
+                DataColumn(
+                    label: Expanded(child: Container(child: Text('Retrieve')))),
               ],
               rows: List.generate(savedDataList.length, (index) {
                   List<Credit> creditList;
@@ -134,8 +97,7 @@ class _ViewSavedDataState extends State<ViewSavedData> {
 
 
                   /*todo showing same reading twice*/
-                for (var i in savedDataList) {
-                  SavedData savedData = i;
+                  SavedData savedData = savedDataList[index];
                   print('here is ' + savedData.toString());
                   creditList = new List();
                   (json.decode(savedData.credits) as List).map((i) {
@@ -160,7 +122,6 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                     readingList.add(reading);
                   }).toList();
 
-                }
                 return DataRow(cells: <DataCell>[
                   //todo change to invoice.invoiceDate
 
@@ -168,11 +129,81 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                   DataCell(Text(Calculations().calculateReadingTotal(readingList).toStringAsFixed(2))),
                   DataCell(Text(Calculations().calculateCreditTotal(creditList).toStringAsFixed(2))),
                   DataCell(Text(Calculations().calculateExtraTotal(extraList).toStringAsFixed(2))),
+
                   DataCell(
                     IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
-                        deleteSavedData(savedDataList[index].id);
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm delete?'),
+                                content: Text('Delete this data?'),
+                                actions: [
+                                  FlatButton(
+                                    child: Text(
+                                      'No',
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text(
+                                      'Yes',
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        deleteSavedData(savedData.id);
+                                      });
+                                      Get.back();
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+
+                      },
+                    ),
+                  ),
+                  DataCell(
+                    IconButton(
+                      icon: Icon(Icons.view_agenda_outlined),
+                      onPressed: () {
+
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm load?'),
+                                content: Text('Load this data?'),
+                                actions: [
+                                  FlatButton(
+                                    child: Text(
+                                      'No',
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text(
+                                      'Yes',
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        mainCreditList=creditList;
+                                        mainReadingList=readingList;
+                                        mainExtraList=extraList;
+                                        Get.to(MyApp());
+                                      });
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+
                       },
                     ),
                   ),

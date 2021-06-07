@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 import 'dart:math';
 
 import 'package:facebook_audience_network/facebook_audience_network.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
 import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
@@ -29,9 +31,9 @@ import 'Preferences.dart';
 import 'extraCalculation.dart';
 import 'package:path/path.dart' as path;
 
-List<Credit> creditList = new List();
-List<Extra> extraList = new List();
-List<Reading> readingList = new List();
+List<Credit> mainCreditList = new List();
+List<Extra> mainExtraList = new List();
+List<Reading> mainReadingList = new List();
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
 Future<Database> database;
@@ -86,8 +88,15 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
+
+  // List<Reading> readingList;
+  // List<Credit> creditList;
+  // List<Extra> extraList;
   @override
   _MyAppState createState() => _MyAppState();
+
+  // MyApp({Key key, this.readingList,this.creditList,this.extraList}) : super(key: key);
+
 }
 
 class _MyAppState extends State<MyApp> {
@@ -262,7 +271,7 @@ class _MyAppState extends State<MyApp> {
   Widget displayTotalAmount() {
     num totalToDisplay = 0;
     totalToDisplay =
-        Calculations().calculateTotal(readingList, extraList, creditList);
+        Calculations().calculateTotal(mainReadingList, mainExtraList, mainCreditList);
     return Text(
       '${totalToDisplay.toStringAsFixed(2)}',
       style: finalAmountStyle(),
@@ -298,18 +307,18 @@ class _MyAppState extends State<MyApp> {
 
   /*todocompleted save operation*/
   saveAll() async {
-    insertSavedData(new SavedData(time:DateFormat("dd-MM-yyyy").format(DateTime.now()),credits: jsonEncode(creditList),extras: jsonEncode(extraList),readings:jsonEncode(readingList) ));
+    insertSavedData(new SavedData(time:DateFormat("dd-MM-yyyy").format(DateTime.now()),credits: jsonEncode(mainCreditList),extras: jsonEncode(mainExtraList),readings:jsonEncode(mainReadingList) ));
 
 
     // ignore: unnecessary_statements
-    readingList.isNotEmpty
-        ? await Preferences().setReadings(jsonEncode(readingList))
+    mainReadingList.isNotEmpty
+        ? await Preferences().setReadings(jsonEncode(mainReadingList))
         : null;
-    creditList.isNotEmpty
-        ? await Preferences().setCredits(jsonEncode(creditList))
+    mainCreditList.isNotEmpty
+        ? await Preferences().setCredits(jsonEncode(mainCreditList))
         : null;
-    extraList.isNotEmpty
-        ? await Preferences().setExtras(jsonEncode(extraList))
+    mainExtraList.isNotEmpty
+        ? await Preferences().setExtras(jsonEncode(mainExtraList))
         : null;
     Fluttertoast.showToast(msg: 'Saved');
   }
@@ -317,7 +326,7 @@ class _MyAppState extends State<MyApp> {
   retrieveAll() async {
     /*retieve all values*/
     setState(() {
-      readingList.clear();
+      mainReadingList.clear();
     });
     String readings = await Preferences().getReadings();
     try {
@@ -328,7 +337,7 @@ class _MyAppState extends State<MyApp> {
         print('readingObject is ${readingObject.toString()}');
         setState(() {
           print('readingObject is ${readingObject.toString()}');
-          readingList.add(readingObject);
+          mainReadingList.add(readingObject);
         });
       }).toList();
     } catch (e) {
@@ -336,7 +345,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     setState(() {
-      creditList.clear();
+      mainCreditList.clear();
     });
     String credits = await Preferences().getCredits();
     try {
@@ -347,7 +356,7 @@ class _MyAppState extends State<MyApp> {
         print('creditObject is ${creditObject.toString()}');
         setState(() {
           print('creditObject is ${creditObject.toString()}');
-          creditList.add(creditObject);
+          mainCreditList.add(creditObject);
         });
       }).toList();
     } catch (e) {
@@ -355,7 +364,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     setState(() {
-      extraList.clear();
+      mainExtraList.clear();
     });
     String extras = await Preferences().getExtras();
     try {
@@ -366,7 +375,7 @@ class _MyAppState extends State<MyApp> {
         print('extraObject is ${extraObject.toString()}');
         setState(() {
           print('extraObject is ${extraObject.toString()}');
-          extraList.add(extraObject);
+          mainExtraList.add(extraObject);
         });
       }).toList();
     } catch (e) {
@@ -382,35 +391,100 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       drawer: buildDrawer(context),
 
+
       appBar: AppBar(
         title: new Text(
           'Pump Calculator',
         ),
         actions: [
-          // IconButton(
-          //   icon: Icon(Icons.refresh),
-          //   onPressed: () {
-          //     setState(() {});
-          //   },
-          // ),
-          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-              ? Tooltip(
-            message: 'Save data',
-            child: IconButton(
-              icon: Icon(Icons.save),
-              onPressed: () async {
-                if(!adFree){
-                  _showInterstitialAd();
-                }
-               await saveAll();
-              },
+          !(mainReadingList.isEmpty && mainExtraList.isEmpty && mainCreditList.isEmpty)?IconButton(icon: Icon(Icons.delete_forever_outlined), onPressed: (){
+            if(!adFree){
+              _showInterstitialAd();
+            }
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Confirmation'),
+                    content: Text('Clear all data?'),
+                    actions: [
+                      FlatButton(
+                        child: Text(
+                          'No',
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text(
+                          'Yes',
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            mainReadingList.clear();
+                            mainExtraList.clear();
+                            mainCreditList.clear();
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                });
+          }):Container()
+        ],
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            adFree?Container():Container(
+              alignment: Alignment(0.5, 1),
+              child: FacebookBannerAd(
+                placementId: "2342543822724448_2342544912724339",
+                bannerSize: BannerSize.STANDARD,
+                listener: (result, value) {
+                  switch (result) {
+                    case BannerAdResult.ERROR:
+                      print("Error: $value");
+                      break;
+                    case BannerAdResult.LOADED:
+                      print("Loaded: $value");
+                      break;
+                    case BannerAdResult.CLICKED:
+                      print("Clicked: $value");
+                      break;
+                    case BannerAdResult.LOGGING_IMPRESSION:
+                      print("Logging Impression: $value");
+                      break;
+                  }
+                },
+              ),
             ),
-          )
-              : Container(),
-          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-              ? Tooltip(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                !(mainReadingList.isEmpty && mainExtraList.isEmpty && mainCreditList.isEmpty)
+                    ? Tooltip(
+                  message: 'Save data',
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.save),
+                    onPressed: () async {
+                      if(!adFree){
+                        _showInterstitialAd();
+                      }
+                      await saveAll();
+                    }, label: Text('Save'),
+                  ),
+                )
+                    : Container(),
+                !(mainReadingList.isEmpty && mainExtraList.isEmpty && mainCreditList.isEmpty)
+                    ? Tooltip(
                   message: 'Print',
-                  child: IconButton(
+                  child: ElevatedButton.icon(
                     icon: Icon(Icons.print),
                     onPressed: () {
 
@@ -474,10 +548,10 @@ class _MyAppState extends State<MyApp> {
                                   onPressed: ()  {
 
                                     if(saveAsController.text!=''){
-                                      PDFPrint().pdfTotal(readingList, creditList, extraList,saveAsController.text);
+                                      PDFPrint().pdfTotal(mainReadingList, mainCreditList, mainExtraList,saveAsController.text);
 
                                     }else{
-                                      PDFPrint().pdfTotal(readingList, creditList, extraList,'calculations');
+                                      PDFPrint().pdfTotal(mainReadingList, mainCreditList, mainExtraList,'calculations');
 
                                       // Fluttertoast.showToast(msg: 'Enter valid document name');
                                     }
@@ -487,117 +561,95 @@ class _MyAppState extends State<MyApp> {
                             );
                           });
 
-                    },
+                    }, label: Text('Print'),
                   ),
                 )
-              : Container(),
-          !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)
-              ? Tooltip(
+                    : Container(),
+                !(mainReadingList.isEmpty && mainExtraList.isEmpty && mainCreditList.isEmpty)
+                    ? Tooltip(
                   message: 'Share',
-                  child: IconButton(
+                  child: ElevatedButton.icon(
                     icon: Icon(Icons.share),
                     onPressed: () {
                       setState(() {
                         Calculations()
-                            .share(readingList, extraList, creditList);
+                            .share(mainReadingList, mainExtraList, mainCreditList);
                       });
-                    },
+                    }, label: Text('Share'),
                   ),
                 )
-              : Container(),
-PopupMenuButton(
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'ret',
-                      child: Text('Retrieve'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'del',
-                      child: Text('Delete'),
-                    ),
-                  ],
-                  onSelected: (String value) {
-                    if (value == 'ret') {
-                      if(!adFree){
-                        _showInterstitialAd();
-                      }
-                      retrieveAll();
+                    : Container(),
 
-                    } else if (value == 'del') {
-                      if(!adFree){
-                        _showInterstitialAd();
-                      }
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Confirmation'),
-                              content: Text('Clear all data?'),
-                              actions: [
-                                FlatButton(
-                                  child: Text(
-                                    'No',
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                FlatButton(
-                                  child: Text(
-                                    'Yes',
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      readingList.clear();
-                                      extraList.clear();
-                                      creditList.clear();
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          });
-                    }
-                  },
-                )
-        ],
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            adFree?Container():Container(
-              alignment: Alignment(0.5, 1),
-              child: FacebookBannerAd(
-                placementId: "2342543822724448_2342544912724339",
-                bannerSize: BannerSize.STANDARD,
-                listener: (result, value) {
-                  switch (result) {
-                    case BannerAdResult.ERROR:
-                      print("Error: $value");
-                      break;
-                    case BannerAdResult.LOADED:
-                      print("Loaded: $value");
-                      break;
-                    case BannerAdResult.CLICKED:
-                      print("Clicked: $value");
-                      break;
-                    case BannerAdResult.LOGGING_IMPRESSION:
-                      print("Logging Impression: $value");
-                      break;
-                  }
-                },
-              ),
+
+              ],
             ),
+
+
+            (mainReadingList.isNotEmpty ||
+                    mainCreditList.isNotEmpty ||
+                    mainExtraList.isNotEmpty)
+                ? Center(child: displayTotalAmount())
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      ApplicationConstants.mainTips,
+                      style: TextStyle(
+                          color: Colors.blueGrey, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+
+            mainReadingList.isNotEmpty
+                ? displayData('Reading',
+                    Calculations().calculateReadingTotal(mainReadingList))
+                : Text(''),
+            mainReadingList.isNotEmpty ? buildReadingList() : Text(''),
+
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: readingList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(readingList[index].toString());
+            //       }),
+            // ),
+
+            mainCreditList.isNotEmpty
+                ? displayData(
+                    'Credit', Calculations().calculateCreditTotal(mainCreditList))
+                : Text(''),
+            mainCreditList.isNotEmpty ? buildCreditList() : Text(''),
+
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: creditList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(creditList[index].toString());
+            //       }),
+            // )
+
+            mainExtraList.isNotEmpty
+                ? displayData(
+                    'Extras', Calculations().calculateExtraTotal(mainExtraList))
+                : Text(''),
+            mainExtraList.isNotEmpty ? buildExpenseList() : Text(''),
+            // Expanded(
+            //   child: new ListView.builder(
+            //       shrinkWrap: true,
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: expenseList.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return new Text(expenseList[index].toString());
+            //       }),
+            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                RaisedButton(
-                  child: Text(
+                ElevatedButton.icon(
+                  icon: Icon(Icons.add),
+                  label: Text(
                     'Reading',
                   ),
                   onPressed: () {
@@ -611,8 +663,8 @@ PopupMenuButton(
                         });
                   },
                 ),
-                RaisedButton(
-                  child: Text(
+                ElevatedButton.icon(
+                  label: Text(
                     'Credit',
                   ),
                   onPressed: () {
@@ -624,10 +676,10 @@ PopupMenuButton(
                             dialog: true,
                           );
                         });
-                  },
+                  }, icon: Icon(Icons.remove),
                 ),
-                RaisedButton(
-                  child: Text(
+                ElevatedButton.icon(
+                  label: Text(
                     'Extra',
                   ),
                   onPressed: () {
@@ -639,71 +691,11 @@ PopupMenuButton(
                             dialog: true,
                           );
                         });
-                  },
+                  }, icon: Icon(Icons.miscellaneous_services),
                 ),
               ],
             ),
-
-            (readingList.isNotEmpty ||
-                    creditList.isNotEmpty ||
-                    extraList.isNotEmpty)
-                ? Center(child: displayTotalAmount())
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      ApplicationConstants.mainTips,
-                      style: TextStyle(
-                          color: Colors.blueGrey, fontStyle: FontStyle.italic),
-                    ),
-                  ),
-
-            readingList.isNotEmpty
-                ? displayData('Reading',
-                    Calculations().calculateReadingTotal(readingList))
-                : Text(''),
-            readingList.isNotEmpty ? buildReadingList() : Text(''),
-
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: readingList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(readingList[index].toString());
-            //       }),
-            // ),
-
-            creditList.isNotEmpty
-                ? displayData(
-                    'Credit', Calculations().calculateCreditTotal(creditList))
-                : Text(''),
-            creditList.isNotEmpty ? buildCreditList() : Text(''),
-
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: creditList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(creditList[index].toString());
-            //       }),
-            // )
-
-            extraList.isNotEmpty
-                ? displayData(
-                    'Extras', Calculations().calculateExtraTotal(extraList))
-                : Text(''),
-            extraList.isNotEmpty ? buildExpenseList() : Text(''),
-            // Expanded(
-            //   child: new ListView.builder(
-            //       shrinkWrap: true,
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: expenseList.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return new Text(expenseList[index].toString());
-            //       }),
-            // ),
-            !(readingList.isEmpty && extraList.isEmpty && creditList.isEmpty)?FacebookNativeAd(
+            !(mainReadingList.isEmpty && mainExtraList.isEmpty && mainCreditList.isEmpty)?FacebookNativeAd(
               placementId: "2342543822724448_2716142125364614",
               adType: NativeAdType.NATIVE_BANNER_AD,
               bannerAdSize: NativeBannerAdSize.HEIGHT_100,
@@ -743,17 +735,17 @@ PopupMenuButton(
             DataColumn(label: Expanded(child: Container(child: Text('Edit')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(readingList.length, (index) {
+          rows: List.generate(mainReadingList.length, (index) {
             return DataRow(cells: <DataCell>[
-              DataCell(Text(readingList[index].description)),
-              DataCell(Text(readingList[index].startingReading.toString())),
-              DataCell(Text(readingList[index].endingReading.toString())),
+              DataCell(Text(mainReadingList[index].description)),
+              DataCell(Text(mainReadingList[index].startingReading.toString())),
+              DataCell(Text(mainReadingList[index].endingReading.toString())),
               DataCell(calculateReadingLitreTotal(
-                  readingList[index].startingReading,
-                  readingList[index].endingReading)),
-              DataCell(Text(readingList[index].rate.toString())),
-              DataCell(calculateReadingTotal(readingList[index].startingReading,
-                  readingList[index].endingReading, readingList[index].rate)),
+                  mainReadingList[index].startingReading,
+                  mainReadingList[index].endingReading)),
+              DataCell(Text(mainReadingList[index].rate.toString())),
+              DataCell(calculateReadingTotal(mainReadingList[index].startingReading,
+                  mainReadingList[index].endingReading, mainReadingList[index].rate)),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.edit),
@@ -778,7 +770,7 @@ PopupMenuButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
                     setState(() {
-                      readingList.removeAt(index);
+                      mainReadingList.removeAt(index);
                     });
                   },
                 ),
@@ -799,16 +791,16 @@ PopupMenuButton(
                 label: Expanded(child: Container(child: Text('Amount')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(extraList.length, (index) {
+          rows: List.generate(mainExtraList.length, (index) {
             return DataRow(cells: <DataCell>[
-              DataCell(Text(extraList[index].description)),
-              DataCell(Text(extraList[index].amount.toString())),
+              DataCell(Text(mainExtraList[index].description)),
+              DataCell(Text(mainExtraList[index].amount.toString())),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
                     setState(() {
-                      extraList.removeAt(index);
+                      mainExtraList.removeAt(index);
                     });
                   },
                 ),
@@ -832,13 +824,13 @@ PopupMenuButton(
             DataColumn(label: Expanded(child: Container(child: Text('Edit')))),
             DataColumn(label: Expanded(child: Container(child: Text('Del')))),
           ],
-          rows: List.generate(creditList.length, (index) {
+          rows: List.generate(mainCreditList.length, (index) {
             return DataRow(cells: <DataCell>[
-              DataCell(Text(creditList[index].description)),
-              DataCell(Text(creditList[index].litre.toString())),
-              DataCell(Text(creditList[index].rate.toString())),
+              DataCell(Text(mainCreditList[index].description)),
+              DataCell(Text(mainCreditList[index].litre.toString())),
+              DataCell(Text(mainCreditList[index].rate.toString())),
               DataCell(calculateCreditTotal(
-                  creditList[index].litre, creditList[index].rate)),
+                  mainCreditList[index].litre, mainCreditList[index].rate)),
               DataCell(
                 IconButton(
                   icon: Icon(Icons.edit),
@@ -862,7 +854,7 @@ PopupMenuButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
                     setState(() {
-                      creditList.removeAt(index);
+                      mainCreditList.removeAt(index);
                     });
                   },
                 ),

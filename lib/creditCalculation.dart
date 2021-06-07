@@ -36,7 +36,7 @@ class _creditCalculationState extends State<creditCalculation> {
     }
 
     if(edit&&index!=-1){
-      editCredit=creditList[index];
+      editCredit=mainCreditList[index];
       descriptionController.text=editCredit.description;
       litreController.text=editCredit.litre.toString();
       rateController.text=editCredit.rate.toString();

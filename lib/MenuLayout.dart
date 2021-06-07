@@ -104,7 +104,7 @@ Future<List<SavedData>> getAllSavedData() async {
   final Database db = await database;
 
   // Query the table for all The Dogs.
-  final List<Map<String, dynamic>> maps = await db.query('SavedData');
+  final List<Map<String, dynamic>> maps = await db.query('SavedData',orderBy: 'id DESC');
 
   // Convert the List<Map<String, dynamic> into a List<Dog>.
   return List.generate(maps.length, (i) {

@@ -133,7 +133,7 @@ class Calculations {
 
     num total = (ending - starting) * rate;
 
-    readingList.add(new Reading(
+    mainReadingList.add(new Reading(
         description: description.text,
         startingReading: starting,
         endingReading: ending,
@@ -165,7 +165,7 @@ class Calculations {
 
     num total = (ending - starting) * rate;
 
-    readingList[index]=new Reading(
+    mainReadingList[index]=new Reading(
         description: description.text,
         startingReading: starting,
         endingReading: ending,
@@ -185,7 +185,7 @@ class Calculations {
     if(selection==1){
       expenseTotal=-expenseTotal;
     }
-    extraList
+    mainExtraList
         .add(new Extra(description: description.text, amount: expenseTotal));
 
 
@@ -209,7 +209,7 @@ class Calculations {
 
     num total = litre * rate;
 
-    creditList.add(
+    mainCreditList.add(
         new Credit(litre: litre, description: description.text, rate: rate));
     return total.round();
   }
@@ -232,7 +232,7 @@ class Calculations {
 
     num total = litre * rate;
 
-    creditList[index]=
+    mainCreditList[index]=
         new Credit(litre: litre, description: description.text, rate: rate);
     return total.round();
   }
