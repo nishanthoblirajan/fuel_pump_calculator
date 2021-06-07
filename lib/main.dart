@@ -34,7 +34,7 @@ import 'package:path/path.dart' as path;
 List<Credit> mainCreditList = new List();
 List<Extra> mainExtraList = new List();
 List<Reading> mainReadingList = new List();
-
+bool adFree=false;
 FirebaseAnalytics analytics = FirebaseAnalytics();
 Future<Database> database;
 Future<void> main() async {
@@ -109,7 +109,7 @@ class _MyAppState extends State<MyApp> {
 
   StreamSubscription _subscription;
 
-  bool adFree=false;
+
 
   _getPastPurchases() async {
     QueryPurchaseDetailsResponse response = await _iap.queryPastPurchases();
@@ -139,7 +139,7 @@ class _MyAppState extends State<MyApp> {
       await _iap.completePurchase(purchase);
     }
     if(purchase!=null&&purchase.status==PurchaseStatus.purchased&&purchase.billingClientPurchase.isAcknowledged){
-      print('Product already purchased');
+      print('AdFree purchased');
       Preferences().setAdFree(true);
     }else{
       Preferences().setAdFree(false);
@@ -307,7 +307,7 @@ class _MyAppState extends State<MyApp> {
 
   /*todocompleted save operation*/
   saveAll() async {
-    insertSavedData(new SavedData(time:DateFormat("dd-MM-yyyy").format(DateTime.now()),credits: jsonEncode(mainCreditList),extras: jsonEncode(mainExtraList),readings:jsonEncode(mainReadingList) ));
+    insertSavedData(new SavedData(time:DateFormat("hh:mm:ss dd-MM-yyyy").format(DateTime.now()),credits: jsonEncode(mainCreditList),extras: jsonEncode(mainExtraList),readings:jsonEncode(mainReadingList) ));
 
 
     // ignore: unnecessary_statements

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:facebook_audience_network/ad/ad_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/DataClass/Reading.dart';
 import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
@@ -23,9 +24,71 @@ class _ViewSavedDataState extends State<ViewSavedData> {
     return Scaffold(
       appBar: AppBar(
         title: Text('All Data'),
+        actions: [
+          IconButton(icon: Icon(Icons.delete_forever_outlined), onPressed: (){
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Confirm delete?'),
+                    content: Text('Delete all data?'),
+                    actions: [
+                      FlatButton(
+                        child: Text(
+                          'No',
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text(
+                          'Yes',
+                        ),
+                        onPressed: () {
+                          deleteAll();
+                          setState(() {
+
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                });
+          })
+        ],
       ),
-      body: Container(
-        child: viewAllData(context),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            adFree?Container():Container(
+              alignment: Alignment(0.5, 1),
+              child: FacebookBannerAd(
+                placementId: "2342543822724448_2839315346380624",
+                bannerSize: BannerSize.STANDARD,
+                listener: (result, value) {
+                  switch (result) {
+                    case BannerAdResult.ERROR:
+                      print("Error: $value");
+                      break;
+                    case BannerAdResult.LOADED:
+                      print("Loaded: $value");
+                      break;
+                    case BannerAdResult.CLICKED:
+                      print("Clicked: $value");
+                      break;
+                    case BannerAdResult.LOGGING_IMPRESSION:
+                      print("Logging Impression: $value");
+                      break;
+                  }
+                },
+              ),
+            ),
+            viewAllData(context),
+          ],
+        ),
       ),
     );
   }

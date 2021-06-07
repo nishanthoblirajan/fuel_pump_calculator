@@ -20,7 +20,7 @@ Widget buildDrawer(BuildContext context) {
         Container(
           child: ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-              title: Text('Saved Items'),
+              title: Text('Saved calculations'),
               leading: Icon(Icons.save_alt),
               onTap: () {
                 Get.to(ViewSavedData());
@@ -130,7 +130,15 @@ Future<void> deleteSavedData(int id) async {
     whereArgs: [id],
   );
 }
+Future<void> deleteAll() async {
+  // Get a reference to the database.
+  final db = await database;
 
+  // Remove the Dog from the Database.
+  await db.delete(
+    'SavedData'
+  );
+}
 Future<void> updateSavedData(SavedData savedData  ) async {
   // Get a reference to the database.
   final db = await database;
