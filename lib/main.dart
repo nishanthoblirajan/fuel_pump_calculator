@@ -9,12 +9,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuel_pump_calculator/Calculations.dart';
+import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
 import 'package:fuel_pump_calculator/PDFPrint.dart';
 import 'package:fuel_pump_calculator/creditCalculation.dart';
 import 'package:fuel_pump_calculator/readingCalculation.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:intl/intl.dart';
 import 'package:share/share.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'ApplicationConstants.dart';
 import 'DataClass/Credit.dart';
@@ -24,17 +27,32 @@ import 'HexColor.dart';
 import 'MenuLayout.dart';
 import 'Preferences.dart';
 import 'extraCalculation.dart';
+import 'package:path/path.dart' as path;
 
 List<Credit> creditList = new List();
 List<Extra> extraList = new List();
 List<Reading> readingList = new List();
 
 FirebaseAnalytics analytics = FirebaseAnalytics();
-
-void main() {
+Future<Database> database;
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-
+  database = openDatabase(
+    // Set the path to the database. Note: Using the `join` function from the
+    // `path` package is best practice to ensure the path is correctly
+    // constructed for each platform.
+      path.join(await getDatabasesPath(), 'saved_data.db'),
+  onCreate: (db, version) {
+  // Run the CREATE TABLE statement on the database.
+  return db.execute(
+  "CREATE TABLE SavedData(id INTEGER PRIMARY KEY, time TEXT, credits TEXT, extras TEXT, readings TEXT)",
+  );
+  },
+  // Set the version. This executes the onCreate function and provides a
+  // path to perform database upgrades and downgrades.
+  version: 1,
+  );
   InAppPurchaseConnection.enablePendingPurchases();
 
   Firebase.initializeApp();
@@ -280,6 +298,9 @@ class _MyAppState extends State<MyApp> {
 
   /*todocompleted save operation*/
   saveAll() async {
+    insertSavedData(new SavedData(time:DateFormat("dd-MM-yyyy").format(DateTime.now()),credits: jsonEncode(creditList),extras: jsonEncode(extraList),readings:jsonEncode(readingList) ));
+
+
     // ignore: unnecessary_statements
     readingList.isNotEmpty
         ? await Preferences().setReadings(jsonEncode(readingList))
