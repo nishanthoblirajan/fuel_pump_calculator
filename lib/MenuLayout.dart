@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
+import 'package:fuel_pump_calculator/ViewSavedData.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sqflite/sqflite.dart';
@@ -16,6 +17,15 @@ Widget buildDrawer(BuildContext context) {
     child: ListView(
       children: <Widget>[
         buildHeadingMenu('Menu'),
+        Container(
+          child: ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              title: Text('Saved Items'),
+              leading: Icon(Icons.save_alt),
+              onTap: () {
+                Get.to(ViewSavedData());
+              }),
+        ),
         Container(
           child: ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
