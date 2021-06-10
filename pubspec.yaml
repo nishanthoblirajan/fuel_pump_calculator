@@ -11,22 +11,23 @@ description: Fuel Pump Calculator for DSMs
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.6.0+12
+version: 1.6.1+14
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
+  sentry_flutter: ^5.1.0
   intl: ^0.16.1
   get: ^3.23.1
   share: ^0.6.5+4
   facebook_audience_network: ^0.8.0
-  firebase_core: ^0.7.0
-  firebase_analytics: ^7.0.1
-  pdf: ^2.0.0
-  shared_preferences: ^0.5.12+4
-  path_provider: ^1.6.27
-  printing: ^4.0.0
+  firebase_core: ^1.2.1
+  firebase_analytics: ^8.1.1
+  pdf: ^3.3.0
+  shared_preferences: ^2.0.6
+  path_provider: ^2.0.2
+  printing: ^5.2.1
   fluttertoast: ^7.1.6
   open_file: ^3.0.3
   sqflite: ^2.0.0+3

@@ -115,7 +115,6 @@ class _AdsRemoveState extends State<AdsRemove> {
         ),
         body:Column(
           children: [
-
             for(var prod in _products)
               if(_hasPurchased(prod.id)!=null)
                 ...[

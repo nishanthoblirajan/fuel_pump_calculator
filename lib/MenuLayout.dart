@@ -5,6 +5,7 @@ import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
 import 'package:fuel_pump_calculator/ViewSavedData.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'ApplicationConstants.dart';
@@ -26,6 +27,22 @@ Widget buildDrawer(BuildContext context) {
                 Get.to(ViewSavedData());
               }),
         ),
+        // Container(
+        //   child: ListTile(
+        //       contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+        //       title: Text('Test Error'),
+        //       leading: Icon(FlutterIcons.ad_faw5s),
+        //       onTap: () async {
+        //         try {
+        //           throw Exception;
+        //         } catch (exception, stackTrace) {
+        //           await Sentry.captureException(
+        //             exception,
+        //             stackTrace: stackTrace,
+        //           );
+        //         }
+        //       }),
+        // ),
         Container(
           child: ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 20.0),

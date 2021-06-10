@@ -18,6 +18,7 @@ import 'package:fuel_pump_calculator/readingCalculation.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:share/share.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -34,9 +35,9 @@ import 'package:path/path.dart' as path;
 List<Credit> mainCreditList = new List();
 List<Extra> mainExtraList = new List();
 List<Reading> mainReadingList = new List();
-bool adFree=false;
 FirebaseAnalytics analytics = FirebaseAnalytics();
 Future<Database> database;
+bool adFree=false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -58,33 +59,38 @@ Future<void> main() async {
   InAppPurchaseConnection.enablePendingPurchases();
 
   Firebase.initializeApp();
+  await SentryFlutter.init(
+        (options) {
+      options.dsn = 'https://457e5c85f5d34e609418c9665f47f9f9@o420327.ingest.sentry.io/5810637';
+    },
+    appRunner: () => runApp(GetMaterialApp(
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: analytics),
+        ],
+        title: 'Fuel Pump Calculator',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: HexColor(ApplicationConstants.mainColor),
+          // textTheme: GoogleFonts.loraTextTheme(),
+          // primaryTextTheme: TextTheme(
+          //   headline6: GoogleFonts.lora(
+          //     fontWeight: FontWeight.w600,
+          //   ),
+          // ),
+        ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          primaryColor: HexColor(ApplicationConstants.mainColor),
 
-  runApp(GetMaterialApp(
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: analytics),
-      ],
-      title: 'Fuel Pump Calculator',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: HexColor(ApplicationConstants.mainColor),
-        // textTheme: GoogleFonts.loraTextTheme(),
-        // primaryTextTheme: TextTheme(
-        //   headline6: GoogleFonts.lora(
-        //     fontWeight: FontWeight.w600,
-        //   ),
-        // ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: HexColor(ApplicationConstants.mainColor),
+          // primaryTextTheme: TextTheme(
+          //   headline6: GoogleFonts.lora(
+          //     fontWeight: FontWeight.w600,
+          //   ),
+          // )
+        ),
+        home: MyApp())),
+  );
 
-        // primaryTextTheme: TextTheme(
-        //   headline6: GoogleFonts.lora(
-        //     fontWeight: FontWeight.w600,
-        //   ),
-        // )
-      ),
-      home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -108,6 +114,7 @@ class _MyAppState extends State<MyApp> {
   List<PurchaseDetails> _purchases = [];
 
   StreamSubscription _subscription;
+
 
 
 
@@ -141,8 +148,11 @@ class _MyAppState extends State<MyApp> {
     if(purchase!=null&&purchase.status==PurchaseStatus.purchased&&purchase.billingClientPurchase.isAcknowledged){
       print('AdFree purchased');
       Preferences().setAdFree(true);
+      adFree=true;
     }else{
       Preferences().setAdFree(false);
+      adFree=true;
+
 
     }
   }
@@ -204,15 +214,16 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   void initState() {
+    _initialize();
     FacebookAudienceNetwork.init(
       // testingId: "5ac2b819-0f53-4e7d-80ab-c3145ff29a1b", //optional
       // testingId: "aa2aaf1b-a217-40a7-8346-8420995a1349", //optional
-      testingId: "fc099c41-f001-48ed-b934-ec87fb91e37d", //optional
+      testingId: "55f68f88-90db-4854-80b7-06c0af3eeeca", //optional
+      // testingId: "cf58dd5f-bf77-4ff6-a37d-08b25f052e9f", //optional
     );
 
     _loadInterstitialAd();
 
-    _initialize();
     rateInputController = new TextEditingController();
     openingReadingController = new TextEditingController();
     closingReadingController = new TextEditingController();
@@ -229,6 +240,7 @@ class _MyAppState extends State<MyApp> {
         });
       }else{
         Preferences().setAdFree(false);
+        adFree=false;
       }
     });
     Preferences().getReadings().then((value) {

@@ -4,12 +4,14 @@ import 'package:facebook_audience_network/ad/ad_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:fuel_pump_calculator/DataClass/Reading.dart';
 import 'package:fuel_pump_calculator/DataClass/SavedData.dart';
+import 'package:fuel_pump_calculator/Preferences.dart';
 import 'package:fuel_pump_calculator/main.dart';
 import 'package:get/get.dart';
 import 'Calculations.dart';
 import 'DataClass/Credit.dart';
 import 'DataClass/Extra.dart';
 import 'MenuLayout.dart';
+import 'PDFPrint.dart';
 
 class ViewSavedData extends StatefulWidget {
   const ViewSavedData({Key key}) : super(key: key);
@@ -19,6 +21,12 @@ class ViewSavedData extends StatefulWidget {
 }
 
 class _ViewSavedDataState extends State<ViewSavedData> {
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,6 +136,7 @@ class _ViewSavedDataState extends State<ViewSavedData> {
       ),
     );
   }
+  TextEditingController saveAsController = new TextEditingController();
 
 
   showAllSavedData(List<SavedData> savedDataList) {
@@ -151,7 +160,11 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                 DataColumn(
                     label: Expanded(child: Container(child: Text('Delete')))),
                 DataColumn(
-                    label: Expanded(child: Container(child: Text('Retrieve')))),
+                    label: Expanded(child: Container(child: Text('Print')))),
+                DataColumn(
+                    label: Expanded(child: Container(child: Text('Share')))),
+                DataColumn(
+                    label: Expanded(child: Container(child: Text('View')))),
               ],
               rows: List.generate(savedDataList.length, (index) {
                   List<Credit> creditList;
@@ -232,7 +245,102 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                   ),
                   DataCell(
                     IconButton(
-                      icon: Icon(Icons.view_agenda_outlined),
+                      icon: Icon(Icons.print),
+                      onPressed: () {
+
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Print?'),
+                                content: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Column(
+                                    children: [
+
+                                      Text('Enter the document name to be saved as. Leave it empty for default name.'),
+                                      new TextField(
+                                        controller: saveAsController,
+                                        textInputAction: TextInputAction.next,
+                                        decoration: new InputDecoration(
+                                          labelText: "Save as",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  FlatButton(
+                                    child: Text(
+                                      'No',
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text(
+                                      'Yes',
+                                    ),
+                                    onPressed: () {
+                                      if(saveAsController.text!=''){
+                                        PDFPrint().pdfTotal(readingList, creditList, extraList,saveAsController.text);
+                                        saveAsController.clear();
+                                      }else{
+                                        PDFPrint().pdfTotal(readingList, creditList, extraList,'calculations');
+
+                                        // Fluttertoast.showToast(msg: 'Enter valid document name');
+                                      }
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+
+                      },
+                    ),
+                  ),
+                  DataCell(
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () {
+
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm share?'),
+                                content: Text('Share this data?'),
+                                actions: [
+                                  FlatButton(
+                                    child: Text(
+                                      'No',
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text(
+                                      'Yes',
+                                    ),
+                                    onPressed: () {
+                                      Calculations()
+                                          .share(readingList, extraList, creditList);
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+
+                      },
+                    ),
+                  ),
+                  DataCell(
+                    IconButton(
+                      icon: Icon(Icons.remove_red_eye_rounded),
                       onPressed: () {
 
                         showDialog(
