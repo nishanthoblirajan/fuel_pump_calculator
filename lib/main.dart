@@ -141,20 +141,25 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _verifyPurchase() async {
     PurchaseDetails purchase = _hasPurchased(ApplicationConstants.ad_remove_iap);
-    final pending = !purchase.billingClientPurchase.isAcknowledged;
-    if (pending) {
-      await _iap.completePurchase(purchase);
-    }
-    if(purchase!=null&&purchase.status==PurchaseStatus.purchased&&purchase.billingClientPurchase.isAcknowledged){
-      print('AdFree purchased');
-      Preferences().setAdFree(true);
-      adFree=true;
+    if(purchase.billingClientPurchase!=null){
+      final pending = !purchase.billingClientPurchase.isAcknowledged;
+      if (pending) {
+        await _iap.completePurchase(purchase);
+      }
+      if(purchase!=null&&purchase.status==PurchaseStatus.purchased&&purchase.billingClientPurchase.isAcknowledged){
+        print('AdFree purchased');
+        Preferences().setAdFree(true);
+        adFree=true;
+      }else{
+        Preferences().setAdFree(false);
+        adFree=false;
+      }
     }else{
+      Fluttertoast.showToast(msg: 'Error');
       Preferences().setAdFree(false);
-      adFree=true;
-
-
+      adFree=false;
     }
+
   }
 
   void _initialize() async {
