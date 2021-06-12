@@ -5,15 +5,15 @@ class Store {
   String date;
   String value;
   Store({
-    this.id,
-    this.date,
-    this.value,
+    required this.id,
+    required this.date,
+    required this.value,
   });
 
   Store copyWith({
-    int id,
-    String date,
-    String value,
+    required int id,
+    required String date,
+    required String value,
   }) {
     return Store(
       id: id ?? this.id,
@@ -31,7 +31,11 @@ class Store {
   }
 
   factory Store.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
+    if (map == null) return Store(
+      id: 0,
+      date: '',
+      value:'',
+    );
 
     return Store(
       id: map['id'],

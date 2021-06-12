@@ -10,7 +10,7 @@ class expenseCalculation extends StatefulWidget {
   @override
   _expenseCalculationState createState() => _expenseCalculationState();
 
-  expenseCalculation({Key key, this.dialog}) : super(key: key);
+  expenseCalculation({Key? key, required this.dialog}) : super(key: key);
 }
 
 class _expenseCalculationState extends State<expenseCalculation> {

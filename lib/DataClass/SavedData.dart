@@ -5,7 +5,7 @@ class SavedData {
   final String extras;
   final String readings;
 
-  SavedData({this.id,this.time,this.credits,this.extras, this.readings});
+  SavedData({ this.id,required this.time,required this.credits,required this.extras, required this.readings});
   Map<String, dynamic> toMap() {
     print('savedData in toMap() is $time');
     return {

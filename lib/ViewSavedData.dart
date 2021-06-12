@@ -14,7 +14,7 @@ import 'MenuLayout.dart';
 import 'PDFPrint.dart';
 
 class ViewSavedData extends StatefulWidget {
-  const ViewSavedData({Key key}) : super(key: key);
+  const ViewSavedData({Key? key}) : super(key: key);
 
   @override
   _ViewSavedDataState createState() => _ViewSavedDataState();
@@ -175,14 +175,14 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                   /*todo showing same reading twice*/
                   SavedData savedData = savedDataList[index];
                   print('here is ' + savedData.toString());
-                  creditList = new List();
+                  creditList = [];
                   (json.decode(savedData.credits) as List).map((i) {
                     print('i is $i');
                     Credit credit = Credit.fromJson(jsonDecode(i));
                     print('credit is ${credit.toString()}');
                     creditList.add(credit);
                   }).toList();
-                  extraList = new List();
+                  extraList = [];
                   (json.decode(savedData.extras) as List).map((i) {
                     print('i is $i');
                     Extra extra = Extra.fromJson(jsonDecode(i));
@@ -190,7 +190,7 @@ class _ViewSavedDataState extends State<ViewSavedData> {
                     extraList.add(extra);
                   }).toList();
 
-                  readingList = new List();
+                  readingList = [];
                   (json.decode(savedData.readings) as List).map((i) {
                     print('i is $i');
                     Reading reading = Reading.fromJson(jsonDecode(i));

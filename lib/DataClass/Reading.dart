@@ -6,17 +6,17 @@ class Reading {
   num endingReading;
   num rate;
   Reading({
-    this.description,
-    this.startingReading,
-    this.endingReading,
-    this.rate,
+    required this.description,
+    required this.startingReading,
+    required this.endingReading,
+    required this.rate,
   });
 
   Reading copyWith({
-    String description,
-    num startingReading,
-    num endingReading,
-    num rate,
+    required String description,
+    required num startingReading,
+    required num endingReading,
+    required num rate,
   }) {
     return Reading(
       description: description ?? this.description,
@@ -36,7 +36,12 @@ class Reading {
   }
 
   factory Reading.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
+    if (map == null) return Reading(
+      description: '',
+      startingReading: 0,
+      endingReading: 0,
+      rate: 0,
+    );
 
     return Reading(
       description: map['description'],
@@ -49,11 +54,10 @@ class Reading {
   String toJson() => json.encode(toMap());
 
   factory Reading.fromJson(dynamic json) {
-    Reading reading = new Reading();
-    reading.description=json["description"] as String;
-    reading.startingReading=json["startingReading"] as num;
-    reading.endingReading = json["endingReading"] as num;
-    reading.rate = json["rate"] as num;
+    Reading reading = new Reading(description: json["description"] as String,
+    startingReading: json["startingReading"] as num,
+    endingReading: json["endingReading"] as num,
+    rate: json["rate"] as num);
     return reading;
   }
 

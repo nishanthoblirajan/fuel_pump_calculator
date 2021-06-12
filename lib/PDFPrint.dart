@@ -101,7 +101,7 @@ class PDFPrint {
 
   List<List<String>> readingListTable(
       List<Reading> readingList)  {
-    List<List<String>> listString = new List();
+    List<List<String>> listString = [];
     List<String> heading = [
       'S.No',
       'Description',
@@ -155,7 +155,7 @@ class PDFPrint {
 
   List<List<String>> expenseListTable(
       List<Extra> expenseList)  {
-    List<List<String>> listString = new List();
+    List<List<String>> listString = [];
     List<String> heading = [
       'S.No',
 

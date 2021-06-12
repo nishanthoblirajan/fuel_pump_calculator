@@ -12,7 +12,7 @@ class creditCalculation extends StatefulWidget {
   @override
   _creditCalculationState createState() => _creditCalculationState();
 
-  creditCalculation({Key key, this.dialog,this.edit,this.index}) : super(key: key);
+  creditCalculation({Key? key, required this.dialog,required this.edit,required this.index}) : super(key: key);
 }
 
 final _formKey = GlobalKey<FormState>(); // <-
@@ -22,7 +22,7 @@ class _creditCalculationState extends State<creditCalculation> {
   bool edit = false;
   int index=-1;
 
-  Credit editCredit = new Credit();
+  late Credit editCredit;
   @override
   void initState() {
     if (widget.dialog != null) {

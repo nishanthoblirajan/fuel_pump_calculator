@@ -5,15 +5,15 @@ class Credit {
   num litre;
   num rate;
   Credit({
-    this.description,
-    this.litre,
-    this.rate,
+    required this.description,
+    required this.litre,
+    required this.rate,
   });
 
   Credit copyWith({
-    String description,
-    num litre,
-    num rate,
+    required String description,
+    required num litre,
+    required num rate,
   }) {
     return Credit(
       description: description ?? this.description,
@@ -31,7 +31,14 @@ class Credit {
   }
 
   factory Credit.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
+    // ignore: unnecessary_null_comparison
+    if (map == null) {
+      return Credit(
+        description: '',
+        litre: 0,
+        rate: 0,
+      );
+    }
 
     return Credit(
       description: map['description'],
@@ -43,10 +50,7 @@ class Credit {
   String toJson() => json.encode(toMap());
 
   factory Credit.fromJson(dynamic json){
-    Credit credit = new Credit();
-    credit.description=json["description"] as String;
-    credit.litre = json["litre"] as num;
-    credit.rate = json["rate"] as num;
+    Credit credit = new Credit(description: json["description"] as String, rate: json["rate"] as num,litre: json["litre"] as num);
     return credit;
   }
 

@@ -4,13 +4,13 @@ class Extra {
   String description;
   num amount;
   Extra({
-    this.description,
-    this.amount,
+    required this.description,
+    required this.amount,
   });
 
   Extra copyWith({
-    String description,
-    num amount,
+    required String description,
+    required num amount,
   }) {
     return Extra(
       description: description ?? this.description,
@@ -26,7 +26,10 @@ class Extra {
   }
 
   factory Extra.fromMap(Map<String, dynamic> map) {
-    if (map == null) return null;
+    if (map == null) return Extra(
+      description: '',
+      amount:0,
+    );
 
     return Extra(
       description: map['description'],
@@ -37,9 +40,7 @@ class Extra {
   String toJson() => json.encode(toMap());
 
   factory Extra.fromJson(dynamic json){
-    Extra extra = new Extra();
-    extra.description=json["description"] as String;
-    extra.amount = json["amount"] as num;
+    Extra extra = new Extra(description: json["description"] as String,amount: json["amount"] as num);
     return extra;
 
 

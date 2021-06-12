@@ -92,7 +92,7 @@ Widget buildHeadingMenu(String name) {
 
 Future<void> insertSavedData(SavedData savedData) async {
   // Get a reference to the database.
-  final Database db = await database;
+  final Database db = (await database)!;
 
   // Insert the Dog into the correct table. You might also specify the
   // `conflictAlgorithm` to use in case the same dog is inserted twice.
@@ -110,7 +110,7 @@ Future<void> insertSavedData(SavedData savedData) async {
 }
 
 Future<void> closeDatabase() async {
-  final Database db = await database;
+  final Database db = (await database)!;
   db.close();
 
 
@@ -118,7 +118,7 @@ Future<void> closeDatabase() async {
 
 Future<List<SavedData>> getAllSavedData() async {
   // Get a reference to the database.
-  final Database db = await database;
+  final Database db = (await database)!;
 
   // Query the table for all The Dogs.
   final List<Map<String, dynamic>> maps = await db.query('SavedData',orderBy: 'id DESC');
@@ -139,7 +139,7 @@ Future<void> deleteSavedData(int id) async {
   final db = await database;
 
   // Remove the Dog from the Database.
-  await db.delete(
+  await db!.delete(
     'SavedData',
     // Use a `where` clause to delete a specific dog.
     where: "id = ?",
@@ -152,7 +152,7 @@ Future<void> deleteAll() async {
   final db = await database;
 
   // Remove the Dog from the Database.
-  await db.delete(
+  await db!.delete(
     'SavedData'
   );
 }
@@ -161,7 +161,7 @@ Future<void> updateSavedData(SavedData savedData  ) async {
   final db = await database;
 
   // Update the given Dog.
-  await db.update(
+  await db!.update(
     'SavedData',
     savedData.toMap(),
     // Ensure that the Dog has a matching id.

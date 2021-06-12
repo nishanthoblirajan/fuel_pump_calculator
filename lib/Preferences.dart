@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferences{
-  Future<String> getReadings() async {
+  Future<String?> getReadings() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString('readings');
   }
@@ -10,7 +10,7 @@ class Preferences{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.setString('readings', jewellersName);
   }
-  Future<String> getCredits() async {
+  Future<String?> getCredits() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString('credits');
   }
@@ -19,7 +19,7 @@ class Preferences{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.setString('credits', goldRate);
   }
-  Future<String> getExtras() async {
+  Future<String?> getExtras() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString('extras');
   }
@@ -30,7 +30,7 @@ class Preferences{
   }
 
 
-  Future<bool> getAdFree() async {
+  Future<bool?> getAdFree() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getBool('ad_free');
   }

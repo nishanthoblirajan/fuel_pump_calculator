@@ -16,7 +16,7 @@ class readingCalculation extends StatefulWidget {
   @override
   _readingCalculationState createState() => _readingCalculationState();
 
-  readingCalculation({Key key, this.dialog,this.edit,this.index}) : super(key: key);
+  readingCalculation({Key? key, required this.dialog,required this.edit, this.index}) : super(key: key);
 }
 
 class _readingCalculationState extends State<readingCalculation> {
@@ -28,7 +28,7 @@ class _readingCalculationState extends State<readingCalculation> {
   bool edit = false;
   int index=-1;
 
-  Reading editReading = new Reading();
+  late Reading editReading;
 
   @override
   void initState() {

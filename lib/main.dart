@@ -31,12 +31,20 @@ import 'MenuLayout.dart';
 import 'Preferences.dart';
 import 'extraCalculation.dart';
 import 'package:path/path.dart' as path;
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'consumable_store.dart';
 
-List<Credit> mainCreditList = new List();
-List<Extra> mainExtraList = new List();
-List<Reading> mainReadingList = new List();
+List<Credit> mainCreditList = [];
+List<Extra> mainExtraList = [];
+List<Reading> mainReadingList = [];
 FirebaseAnalytics analytics = FirebaseAnalytics();
-Future<Database> database;
+Future<Database>? database;
 bool adFree=false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +64,7 @@ Future<void> main() async {
   // path to perform database upgrades and downgrades.
   version: 1,
   );
-  InAppPurchaseConnection.enablePendingPurchases();
+  InAppPurchaseAndroidPlatformAddition.enablePendingPurchases();
 
   Firebase.initializeApp();
   await SentryFlutter.init(
@@ -345,7 +353,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       mainReadingList.clear();
     });
-    String readings = await Preferences().getReadings();
+    String readings = (await Preferences().getReadings())!;
     try {
       print('LENGTH IS -------- ${(json.decode(readings) as List).length}');
       (json.decode(readings) as List).map((i) {
@@ -364,7 +372,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       mainCreditList.clear();
     });
-    String credits = await Preferences().getCredits();
+    String credits = (await Preferences().getCredits())!;
     try {
       print('LENGTH IS -------- ${(json.decode(credits) as List).length}');
       (json.decode(credits) as List).map((i) {
@@ -383,7 +391,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       mainExtraList.clear();
     });
-    String extras = await Preferences().getExtras();
+    String extras = (await Preferences().getExtras())!;
     try {
       print('LENGTH IS -------- ${(json.decode(extras) as List).length}');
       (json.decode(extras) as List).map((i) {
